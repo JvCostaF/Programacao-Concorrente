@@ -1,3 +1,8 @@
+/* Disciplina: Programacao Concorrente */
+/* Profa.: Silvana Rossetto */
+/* Aluno: Joao Victor da Costa Farias - 120014876 */
+/* Laboratório: 1 - Atividade 5 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
