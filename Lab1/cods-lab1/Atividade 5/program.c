@@ -18,8 +18,8 @@ typedef struct {
 /*
 Função que cria um vetor de tamanho N, com base no valor escolhido
 */
-int* criaVetor(int size) {
-    int* array = (int*)malloc(size * sizeof(int)); //Alocando espaço para o vetor.
+int* criaVetor(int tamanho) {
+    int* array = (int*)malloc(tamanho * sizeof(int)); //Alocando espaço para o vetor.
 
     if(array == NULL) {
         printf("Problemas com a alocação de memória");
@@ -28,7 +28,7 @@ int* criaVetor(int size) {
 
     srand(time(NULL)); //Usando números aleatórios
 
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < tamanho; i++) {
         array[i] = rand() % 100;
     }
 
@@ -52,31 +52,31 @@ void* addUmParaCadaElemento(void* arg) { //A assinatura do metodo precisou ser a
 
 int main(void) {
 
-    int size, qtdThreads;
+    int tamanho, qtdThreads;
     printf("Digite o tamanho do vetor: \n");
-    scanf("%d", &size);
+    scanf("%d", &tamanho);
 
     printf("Digite o número de threads: \n");
     scanf("%d", &qtdThreads);
 
-    int* array = criaVetor(size);
+    int* array = criaVetor(tamanho);
 
-    printf("Vetor de %d posições:\n", size);
+    printf("Vetor de %d posições:\n", tamanho);
     printf("[ ");
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < tamanho; i++) {
         printf("%d ", array[i]);
     }
     printf("]\n");
 
     pthread_t threads[qtdThreads];
     DadosThread dadosThread[qtdThreads];
-    int parte = size / qtdThreads;
+    int parte = tamanho / qtdThreads;
 
     // Criando threads para processar o vetor
     for(int i = 0; i < qtdThreads; i++) {
         dadosThread[i].array = array;
         dadosThread[i].inicio = i * parte;
-        dadosThread[i].fim = (i == qtdThreads - 1) ? size : (i + 1) * parte;
+        dadosThread[i].fim = (i == qtdThreads - 1) ? tamanho : (i + 1) * parte;
         dadosThread[i].id = i; // Define o ID da thread
 
         if(pthread_create(&threads[i], NULL, addUmParaCadaElemento, &dadosThread[i]) != 0) {
@@ -92,9 +92,9 @@ int main(void) {
         }
     }
 
-    printf("Vetor de %d posições alterado:\n", size);
+    printf("Vetor de %d posições alterado:\n", tamanho);
     printf("[ ");
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < tamanho; i++) {
         printf("%d ", array[i]);
     }
     printf("]\n");
