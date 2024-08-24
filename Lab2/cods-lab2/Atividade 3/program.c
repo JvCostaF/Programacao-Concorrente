@@ -2,6 +2,7 @@
 /* Profa.: Silvana Rossetto */
 /* Aluno: Joao Victor da Costa Farias - 120014876 */
 /* Laboratório: 2 - Atividade 3 */
+/* Código que cria dois vetores com valores randomizados e calcula o produto interno entre esses dois vetores */
 
 #include <stdio.h>
 #include <time.h>
@@ -91,6 +92,9 @@ int main(int argc, char*argv[]){
 
     // Escrever o produto interno
     ret = fwrite(&produtoInterno, sizeof(float), 1, descritorArquivo);
+
+    //print para verificar se o valor que o programa que lê o arquivo está igual ao valor que esse programa calcula.
+    //printf("Produto Interno: %.26f\n", produtoInterno);
 
     //finaliza o uso das variaveis
     fclose(descritorArquivo);
