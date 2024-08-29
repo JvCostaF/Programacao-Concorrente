@@ -9,10 +9,9 @@ float* geradorMatriz(int dimensaoMatriz) {
 
     if(!matriz) {
         fprintf(stderr, "Erro de alocao da memoria da matriz\n");
-        return 2;
+        return NULL;
    }
 
-   srand(time(NULL));
    for(int i=0; i<dimensaoMatriz; i++){
         *(matriz+i) = (rand() % 1000) * 0.3;
    }
@@ -32,12 +31,14 @@ int main(int argc, char*argv[]){
       fprintf(stderr, "Digite: %s <linhas> <colunas> <arquivo saida>\n", argv[0]);
       return 1;
    }
+
    linhas = atoi(argv[1]); 
    colunas = atoi(argv[2]);
    tam = linhas * colunas;
 
-   float *matriz1 = geradorMatriz(tam);
+   srand(time(NULL));
 
+   float *matriz1 = geradorMatriz(tam);
    float *matriz2 = geradorMatriz(tam);
 
    //escreve a matriz no arquivo
@@ -47,20 +48,34 @@ int main(int argc, char*argv[]){
       fprintf(stderr, "Erro de abertura do arquivo\n");
       return 3;
    }
-   //escreve numero de linhas e de colunas
+  
    ret = fwrite(&linhas, sizeof(int), 1, descritorArquivo);
-   ret = fwrite(&colunas, sizeof(int), 1, descritorArquivo);
-   //escreve os elementos da matriz
-   ret = fwrite(matriz1, sizeof(float), tam, descritorArquivo);
-   ret = fwrite(matriz2, sizeof(float), tam, descritorArquivo);
-   if(ret < tam) {
-      fprintf(stderr, "Erro de escrita no  arquivo\n");
+   if (ret != 1) {
+      fprintf(stderr, "Erro ao escrever as dimensões no arquivo\n");
       return 4;
    }
 
-   //finaliza o uso das variaveis
+   ret = fwrite(&colunas, sizeof(int), 1, descritorArquivo);
+   if (ret != 1) {
+      fprintf(stderr, "Erro ao escrever as dimensões no arquivo\n");
+      return 4;
+   }
+
+   ret = fwrite(matriz1, sizeof(float), tam, descritorArquivo);
+   if (ret != tam) {
+      fprintf(stderr, "Erro ao escrever a primeira matriz no arquivo\n");
+      return 5;
+   }
+
+   ret = fwrite(matriz2, sizeof(float), tam, descritorArquivo);
+   if (ret != tam) {
+      fprintf(stderr, "Erro ao escrever a segunda matriz no arquivo\n");
+      return 6;
+   }
+
    fclose(descritorArquivo);
    free(matriz1);
+   free(matriz2);
    return 0;
 
 }
