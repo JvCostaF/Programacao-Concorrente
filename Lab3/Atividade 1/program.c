@@ -173,24 +173,34 @@ int main(int argc, char *argv[]) {
 
     double inicio, fim, tempoTotal;
 
-    GET_TIME(inicio);
-
-    Matriz *resultado = multiplicaMatrizes(&matriz1, &matriz2);
-    if (resultado != NULL) {
-        imprimeDados(*resultado); // Imprime a matriz resultante
-        free(resultado->dados);   // Liberar a memória da matriz resultante
-        free(resultado);          // Liberar a struct matriz resultante
-    }
-
-    GET_TIME(fim);
-    tempoTotal = fim - inicio;
-
-    printf("Tempo total foi: %.14f", tempoTotal);
-
     descritorArquivo = fopen(argv[2], "wb");
     if (!descritorArquivo) {
         fprintf(stderr, "Erro de abertura do arquivo\n");
         return 3;
+    }
+
+    ret = fwrite(&matriz1.linhas, sizeof(int), 1, descritorArquivo);
+    if (ret != 1) {
+        fprintf(stderr, "Erro ao escrever as dimensões no arquivo\n");
+        return 4;
+    }
+
+    ret = fwrite(&matriz1.colunas, sizeof(int), 1, descritorArquivo);
+    if (ret != 1) {
+        fprintf(stderr, "Erro ao escrever as dimensões no arquivo\n");
+        return 4;
+    }
+
+    ret = fwrite(&matriz2.linhas, sizeof(int), 1, descritorArquivo);
+    if (ret != 1) {
+        fprintf(stderr, "Erro ao escrever as dimensões no arquivo\n");
+        return 4;
+    }
+
+    ret = fwrite(&matriz2.colunas, sizeof(int), 1, descritorArquivo);
+    if (ret != 1) {
+        fprintf(stderr, "Erro ao escrever as dimensões no arquivo\n");
+        return 4;
     }
 
     ret = fwrite(matriz1.dados, sizeof(float), dimensaoMat1, descritorArquivo);
@@ -205,18 +215,34 @@ int main(int argc, char *argv[]) {
         return 5;
     }
 
-    int dimensaoResultado = matriz1.linhas * matriz2.colunas;
+    GET_TIME(inicio);
 
-    ret = fwrite(resultado->dados, sizeof(float), dimensaoResultado, descritorArquivo);
-    if (ret != dimensaoResultado) {
-        fprintf(stderr, "Erro ao escrever a primeira matriz no arquivo\n");
-        return 5;
-    } 
+    Matriz *resultado = multiplicaMatrizes(&matriz1, &matriz2);
+    if (resultado != NULL) {
+        //imprimeDados(*resultado); // Imprime a matriz resultante
+
+        int dimensaoResultado = matriz1.linhas * matriz2.colunas;
+
+        ret = fwrite(resultado->dados, sizeof(float), dimensaoResultado, descritorArquivo);
+        if (ret != dimensaoResultado) {
+            fprintf(stderr, "Erro ao escrever a primeira matriz no arquivo\n");
+            return 5;
+        } 
+
+        free(resultado->dados);   // Liberar a memória da matriz resultante
+        free(resultado);  
+    }
+
+    GET_TIME(fim);
+    tempoTotal = fim - inicio;
+
+    printf("Tempo total foi: %.14f\n", tempoTotal);
 
     // Liberar a memória das outras matrizes
     free(matriz1.dados);
     free(matriz2.dados);
-    free(resultado->dados);
+
+    fclose(descritorArquivo);
 
     return 0;
 }

@@ -65,11 +65,11 @@ int main(int argc, char* argv[]) {
     }
 
     // Imprime as matrizes geradas
-    printf("Matriz 1 (%dx%d):\n", linhasMat1, colunasMat1);
-    printMatriz(matriz1, linhasMat1, colunasMat1);
+    //printf("Matriz 1 (%dx%d):\n", linhasMat1, colunasMat1);
+    //printMatriz(matriz1, linhasMat1, colunasMat1);
 
-    printf("Matriz 2 (%dx%d):\n", linhasMat2, colunasMat2);
-    printMatriz(matriz2, linhasMat2, colunasMat2);
+    //printf("Matriz 2 (%dx%d):\n", linhasMat2, colunasMat2);
+    //printMatriz(matriz2, linhasMat2, colunasMat2);
 
     // abre o arquivo para escrita binária
     descritorArquivo = fopen(argv[5], "wb");
