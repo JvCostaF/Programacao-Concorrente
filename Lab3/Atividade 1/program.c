@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include "timer.h"
 
 /*
 Programa sequencial que ira ler um arquivo binario com as dimensoes (linhas e colunas)de duas matrizes e
@@ -55,11 +57,11 @@ void leDadosBinario(FILE *arquivo, Matriz *matriz1, Matriz *matriz2) {
         exit(1);
     }
 
-
+    // Define as dimensoes das matrizes.
     int dimensaoMat1 = matriz1->linhas * matriz1->colunas;
     int dimensaoMat2 = matriz2->linhas * matriz2->colunas;
 
-    // Alocar memória para os dados das matrizes
+    // Aloca memória para os dados das matrizes
     matriz1->dados = (float*)malloc(dimensaoMat1 * sizeof(float));
     matriz2->dados = (float*)malloc(dimensaoMat2 * sizeof(float));
 
@@ -68,14 +70,14 @@ void leDadosBinario(FILE *arquivo, Matriz *matriz1, Matriz *matriz2) {
         exit(1);
     }
 
-    // Ler os elementos da matriz1
+    // Le os elementos da matriz1
     ret = fread(matriz1->dados, sizeof(float), dimensaoMat1, arquivo);
     if (ret != dimensaoMat1) {
         fprintf(stderr, "Erro ao ler a matriz1 do arquivo\n");
         exit(1);
     }
 
-    // Ler os elementos da matriz2
+    // Le os elementos da matriz2
     ret = fread(matriz2->dados, sizeof(float), dimensaoMat2, arquivo);
     if (ret != dimensaoMat2) {
         fprintf(stderr, "Erro ao ler a matriz2 do arquivo\n");
@@ -114,12 +116,13 @@ void imprimeDados(Matriz matriz) {
  * @return Matriz* A matriz resultante da multiplicação, ou NULL se a multiplicação não for possível.
  */
 Matriz* multiplicaMatrizes(const Matriz *matriz1, const Matriz *matriz2) {
+    // As matrizes podem não ser quadradas
     if (matriz1->colunas != matriz2->linhas) {
         fprintf(stderr, "Erro: O numero de colunas da Matriz 1 deve ser igual ao numero de linhas da Matriz 2.\n");
         return NULL;
     }
 
-    // Alocar memória para a matriz resultante
+    // Aloca memória para a matriz resultante
     Matriz *resultado = (Matriz*)malloc(sizeof(Matriz));
     resultado->linhas = matriz1->linhas;
     resultado->colunas = matriz2->colunas;
@@ -168,12 +171,21 @@ int main(int argc, char *argv[]) {
     int dimensaoMat1 = matriz1.linhas * matriz1.colunas;
     int dimensaoMat2 = matriz2.linhas * matriz2.colunas;
 
+    double inicio, fim, tempoTotal;
+
+    GET_TIME(inicio);
+
     Matriz *resultado = multiplicaMatrizes(&matriz1, &matriz2);
     if (resultado != NULL) {
         imprimeDados(*resultado); // Imprime a matriz resultante
         free(resultado->dados);   // Liberar a memória da matriz resultante
         free(resultado);          // Liberar a struct matriz resultante
     }
+
+    GET_TIME(fim);
+    tempoTotal = fim - inicio;
+
+    printf("Tempo total foi: %.14f", tempoTotal);
 
     descritorArquivo = fopen(argv[2], "wb");
     if (!descritorArquivo) {
@@ -195,18 +207,16 @@ int main(int argc, char *argv[]) {
 
     int dimensaoResultado = matriz1.linhas * matriz2.colunas;
 
-    ret = fwrite(resultado, sizeof(float), dimensaoResultado, descritorArquivo);
+    ret = fwrite(resultado->dados, sizeof(float), dimensaoResultado, descritorArquivo);
     if (ret != dimensaoResultado) {
         fprintf(stderr, "Erro ao escrever a primeira matriz no arquivo\n");
         return 5;
-    }
-
-    // TODO : Implementar escrita no arquivo.bin de saída (que contera as matrizes e a matriz resultante) 
+    } 
 
     // Liberar a memória das outras matrizes
     free(matriz1.dados);
     free(matriz2.dados);
-    free(resultado);
+    free(resultado->dados);
 
     return 0;
 }

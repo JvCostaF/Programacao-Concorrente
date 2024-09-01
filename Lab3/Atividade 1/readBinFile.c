@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 /*
 Programa que recebe um arquivo binario com duas matrizes e a matriz resultante da multiplicao entre as
@@ -23,71 +24,21 @@ typedef struct {
  *
  * @note Esta função encerra o programa com `exit(1)` em caso de erro ao ler os dados ou ao alocar memória.
  */
-void leDadosBinario(FILE *arquivo, Matriz *matriz1, Matriz *matriz2, Matriz *matrizResultado) {
+void leDadosBinario(FILE *arquivo, Matriz *matriz) {
     size_t ret;
 
-    // Ler o número de Linhas
-    ret = fread(&matriz1->linhas, sizeof(int), 1, arquivo);
-    if (ret != 1) {
-        fprintf(stderr, "Erro ao ler o numero de linhas\n");
-        exit(1);
+    Matriz * matriz = malloc(sizeof(Matriz));
+
+    if(!arquivo) {
+        fprinf(stderr, "Erro na abertura do arquivo\n");
+        return NULL;
     }
 
-    // Ler o número de Colunas
-    ret = fread(&matriz1->colunas, sizeof(int), 1, arquivo);
-    if (ret != 1) {
-        fprintf(stderr, "Erro ao ler o numero de colunas\n");
-        exit(1);
-    }
+    int dimensao = matriz->linhas * matriz->colunas;
 
-    // Ler o número de Linhas
-    ret = fread(&matriz2->linhas, sizeof(int), 1, arquivo);
-    if (ret != 1) {
-        fprintf(stderr, "Erro ao ler o numero de linhas\n");
-        exit(1);
-    }
-
-    // Ler o número de Colunas
-    ret = fread(&matriz2->colunas, sizeof(int), 1, arquivo);
-    if (ret != 1) {
-        fprintf(stderr, "Erro ao ler o numero de colunas\n");
-        exit(1);
-    }
-
-
-    int dimensaoMat1 = matriz1->linhas * matriz1->colunas;
-    int dimensaoMat2 = matriz2->linhas * matriz2->colunas;
-    int dimensaoMatResultado = matriz1->linhas * matriz2->colunas;
-
-    // Alocar memória para os dados das matrizes
-    matriz1->dados = (float*)malloc(dimensaoMat1 * sizeof(float));
-    matriz2->dados = (float*)malloc(dimensaoMat2 * sizeof(float));
-
-    matrizResultado->dados = (float*)malloc(dimensaoMatResultado * sizeof(float));
-
-    if (matriz1->dados == NULL || matriz2->dados == NULL) {
-        fprintf(stderr, "Erro na alocacao de memoria\n");
-        exit(1);
-    }
-
-    // Ler os elementos da matriz1
-    ret = fread(matriz1->dados, sizeof(float), dimensaoMat1, arquivo);
-    if (ret != dimensaoMat1) {
-        fprintf(stderr, "Erro ao ler a matriz1 do arquivo\n");
-        exit(1);
-    }
-
-    // Ler os elementos da matriz2
-    ret = fread(matriz2->dados, sizeof(float), dimensaoMat2, arquivo);
-    if (ret != dimensaoMat2) {
-        fprintf(stderr, "Erro ao ler a matriz2 do arquivo\n");
-        exit(1);
-    }
-
-    // Ler os elementos da matriz2
-    ret = fread(matrizResultado->dados, sizeof(float), dimensaoMatResultado, arquivo);
-    if (ret != dimensaoMatResultado) {
-        fprintf(stderr, "Erro ao ler a matriz2 do arquivo\n");
+    ret = fread(matriz->dados, sizeof(float), dimensao, arquivo);
+    if(ret != dimensao) {
+        fprintf(stderr, "Erro ao ler a matriz do arquivo\n");
         exit(1);
     }
 }
@@ -126,7 +77,9 @@ int main(int argc, char* argv[]) {
 
     Matriz matriz1, matriz2, matrizResultado;
 
-    leDadosBinario(arq, &matriz1, &matriz2, &matrizResultado);
+    leDadosBinario(arq, &matriz1);
+    leDadosBinario(arq, &matriz2);
+    leDadosBinario(arq, &matrizResultado);
     fclose(arq);
 
     imprimeDados(matriz1);
