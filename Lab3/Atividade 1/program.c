@@ -3,6 +3,8 @@
 #include <time.h>
 #include "timer.h"
 
+#define F_OK 0
+
 /*
 Programa sequencial que ira ler um arquivo binario com as dimensoes (linhas e colunas)de duas matrizes e
 as duas matrizes respectivamente e ira calcular o produto entre elas.
@@ -148,6 +150,36 @@ Matriz* multiplicaMatrizes(const Matriz *matriz1, const Matriz *matriz2) {
     return resultado;
 }
 
+int checkFile(char *filename) {
+    if (access(filename, F_OK) == 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
+// Escreve os resultados no CSV
+void writeToCSV(char *filename, char tipo, int numThreads, int rows, int cols, double init, double process, double end) {
+
+    char *header = "dimensao,tipo,threads,inicialização,processamento,finalização";
+
+    // Verifica se o arquivo existe
+    int fileExists = checkFile(filename);
+
+    // Prepara arquivo para escrita no de append
+    FILE *file;
+    file = fopen(filename,"a");
+
+    // Caso o arquivo não exista ele adiciona o header
+    if (fileExists == 0) {
+        fprintf(file, "%s\n", header);
+    }
+
+    // Adiciona nova linha
+    fprintf(file, "%dx%d,%c,%d,%lf,%lf,%lf\n", rows, cols, tipo, numThreads, init, process, end);
+    fclose(file);
+}
+
 int main(int argc, char *argv[]) {
 
     FILE * descritorArquivo; //descritor do arquivo de saida
@@ -243,6 +275,8 @@ int main(int argc, char *argv[]) {
     free(matriz2.dados);
 
     fclose(descritorArquivo);
+
+    writeToCSV("medidasTempo.csv", 'S', 1, matriz1.linhas, matriz2.colunas, inicio, tempoTotal, fim);
 
     return 0;
 }
