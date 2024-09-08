@@ -1,0 +1,40 @@
+Aluno: Joao Victor da Costa Farias
+DRE: 120014876
+Laboratório 4
+
+Atividade 1)
+
+3. Para os programas executados com apenas uma thread os resultados foram sempre 100000. Agora assim
+que começamos a executar com o número de threads maior igual que 2 os valores começam a vir diferentes.
+Acredito que isso aconteça por conta de um problema de condição de corrida (condition race) envolvendo
+a variável soma, compartilhada entre as threads. Ao terminar de executar uma thread, o programa tenta
+realizar o printf da variável soma enquanto a(s) outra(s) threads ainda estão executando e acessando
+a variável soma ao mesmo tempo, por isso nem sempre recebemos o resultado esperado. 
+
+4. Não. Ao executar o programa soma.c com apenas duas threads, o maior valor que a variável soma pode
+assumir é 200000, isso nos casos onde uma thread comece e termine sua execução antes da outra começar
+permitindo que o for seja executado corretamente, incrementando a variável soma 100000 ao final de 
+cada thread.
+
+Atividade 2)
+
+2. Sim. Agora estamos isolando a seção crítica, sincronizando as threads com locks. Permitindo que
+cada thread acesso a seção crítica sem concorrência, ou seja, elas irão concluir as iterações do for
+incrementando corretamente a variável soma, eliminando o problema de condição de corrida.   
+
+Atividade 3)
+
+2. A thread extra tem como responsabilidade monitorar o valor da variável compartilhada soma.
+Realizando um loop que verifica se a variável soma é múltiplo de 10 e imprimindo o valor quando essa
+condição for satisfeita. Contudo, como a variável soma é modificada pelas outras threads sem que nenhum
+tipo de sincronização com a thread extra seja definido, os valores impressos refletem o cenário "alguns
+múltiplos de 10" mas não todos. 
+
+3. Esperávamos que os valores impressos fossem todos múltiplos de 10 dentro da faixa de valores
+assumidos pela variável soma. Mas como não existe sincronização entre a thread extra com as outras
+threads o comportamento do programa acaba não sendo o esperado. Resultando na impressão de alguns
+múltiplos de 10 ou outros números. 
+
+4. 
+
+5.
