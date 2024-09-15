@@ -1,0 +1,20 @@
+Aluno: Joao Victor da Costa Farias
+DRE: 120014876
+Laboratório 5
+
+Atividade 1)
+
+1. A expressão BYEBYE só será impressa após duas expressões HELLO serem impressas, isso acontece pois
+a variável "estado" só é incrementada quando uma thread A é executada. E enquanto a variável estado
+não for igual a 2 a thread B não será desbloqueada para teminar sua execução. Veja que é possível que
+a thread B inicie primeiro que as outras threas A's, mas ela permanecerá "adormecida" enquanto a
+condição citada acima não for atendida.
+
+Atividade 2)
+
+1. Os requisitos foram atendidos. As mensagens de "Oi José" e "Oi Maria" são impressas antes da
+mensagem de "Sentem-se por favor", e as mensagens de "Tchau José" e "Tchau Maria" são impressas após
+a mensagem de "Semtem-se por favor" respeitando a pedida do problema. Vale observar que a ordem que 
+as mensagens de "Oi José" e "Oi Maria" e "Tchau José" e "Tchau Maria" não faz diferença desde que
+elas sejam impressas nos momentos certos.
+
