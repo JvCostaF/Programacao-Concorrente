@@ -18,3 +18,11 @@ a mensagem de "Semtem-se por favor" respeitando a pedida do problema. Vale obser
 as mensagens de "Oi José" e "Oi Maria" e "Tchau José" e "Tchau Maria" não faz diferença desde que
 elas sejam impressas nos momentos certos.
 
+Atividade 3)
+
+2. Sim. Antes de executar outra thread é necessário que a thread atual execute todos os seus "passos"
+conforme foi definido no programa.
+
+3. Agora com a barreira funcionando, uma thread só prossegue para o próximos passos quando todas as
+outras threads concluem o esse mesmo passo, ou seja, não teremos o caso onde uma thread termina
+sua iteração para começar outra, como foi visto no item 2. 
