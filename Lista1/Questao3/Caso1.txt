@@ -5,4 +5,6 @@ a) A sequência que resultaria em um erro no MySQL seria:
     seguida a sentença 3 atribuiu NULL a proc_info, o que vai resultar em um erro na execução da sentença
     2.
 
-b) 
+b) A minha ideia para evitar que a atomicidade fosse violada é utilizar uma sincronização por bloqueio,
+onde a Thread que executasse primeiro pegaria o lock para si, permitindo que a proc_info fosse alterada/
+modificada atomicamente, impedindo que a sequência do item a) que quebraria o programa acontecesse.

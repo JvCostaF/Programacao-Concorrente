@@ -1,0 +1,34 @@
+c) Nesse cenário, é interessante usar variáveis de condição, para desbloquear a Thread 2 quando a 
+variável mThread ser inicializada pela Thread 1. 
+
+As mudanças propostas:
+
+pthread_mutex_t mutex;
+pthread_cond_t condUtilizar, condNaoUtilizar;
+
+int podeUsar = 0;
+
+/* Thread 1 */
+void init(...) {
+    pthread_mutex_lock(&mutex);
+    mThread = PR_CreatThread(mMain, ...);
+    ...
+    podeUsar += 1;
+    pthread_cond_signal(&condUtilizar);
+    
+    pthread_cond_wait(&condNaoUtilizar, %mutex);
+
+    pthread_mutex_unlock(&mutex);
+}
+
+/* Thread 2 */
+vod mMain(...) {
+    pthread_mutex_lock(&mutex);
+    if(podeUsar) {
+        mState = mThread->State;
+        ...
+    }else {
+        pthread_cond_signal(&condNaoUtilizar, &mutex);
+    }
+    
+}
