@@ -15,8 +15,6 @@ void init(...) {
     ...
     podeUsar += 1;
     pthread_cond_signal(&condUtilizar);
-    
-    pthread_cond_wait(&condNaoUtilizar, %mutex);
 
     pthread_mutex_unlock(&mutex);
 }
@@ -24,11 +22,10 @@ void init(...) {
 /* Thread 2 */
 vod mMain(...) {
     pthread_mutex_lock(&mutex);
+    pthread_cond_wait(&condUtilizar, &mutex);
     if(podeUsar) {
         mState = mThread->State;
         ...
-    }else {
-        pthread_cond_signal(&condNaoUtilizar, &mutex);
     }
     
 }
