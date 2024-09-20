@@ -35,6 +35,8 @@ assumidos pela variável soma. Mas como não existe sincronização entre a thre
 threads o comportamento do programa acaba não sendo o esperado. Resultando na impressão de alguns
 múltiplos de 10 ou outros números. 
 
-4. 
+4. Os múltiplos de 10.
 
-5.
+5. Agora apenas múltiplos de 10 são impressos. Mas o programa continua sem imprimir todos os múltiplos.
+Talvez, se fosse implementado algum tipo de sinal ao encontrar um múltiplo de 10 para enviar esse sinal
+para o método extra o problema seria resolvido em sua totalidade.
