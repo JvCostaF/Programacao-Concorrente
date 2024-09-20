@@ -1,0 +1,61 @@
+a) O que é seção crítica do código em um programa concorrente?
+
+A instruções ou sentenças escritas no código de alto nível serão traduzidas em código de máquina no 
+processo de compilação do programa. Com isso, durante a execução com várias threads podem ocorrer
+entrelaçamentos das intruções de máquina correspondentes. Essas "regiões" do código de máquina onde
+podem ocorrer os entrelaçamentos são as Seções Críticas. 
+
+b) O que é corrida de dados em um programa concorrente?
+
+É um tipo de erro, gerado pela execução concorrente de fluxos de execução que acessam uma mesma área
+de memória e ao menos uma das operações é de escrita. Toda referência a uma variável que pode ser
+acessada/modificada por outra thread é uma referência crítica. Para impedir a ocorrência de resultados
+indesejáveis para uma determinada computação, os trechos de código que contém referências críticas 
+devem ser executados de forma Atômica. Ligando isso com o item a), esses trechos de código são denominados
+de seção crítica.
+
+c) O que é violação de atomicidade em um programa concorrente?
+
+Uma violação de atomicidade ocorre quando uma operação que deveria ter sido realizada de forma Atômica
+é interrompida ou executada de forma intercalada com outras operações, levando a resultados inconsistentes
+No contexto da programação concorrente, isso pode acontecer quando múltiplas threads tentam acessar e
+modificar uma mesma variável ou recurso compartilhado sem o uso de mecanismos de sincronização como 
+mutexes ou joins.
+
+d) O que é violação de ordem em um programa concorrente?
+
+Uma violação de ordem ocorre quando uma sequência de execução de fluxos esperada é alterada resultando
+em comportamentos e resultados inesperados. Em teoria, não existe uma ordem específica para a execução
+das threads em um programa concorrente, sendo que, mesmo que uma thread termine sua execução antes das
+outras a ausência de mecanismos de sincronização pode fazer com que aconteça uma reordenação durante a
+execução.
+
+e) Como funciona a sincronização por exclusão mútua com bloqueio (que usa locks)?
+
+O bloqueio via lock e unlock faz com que durante a execução dos fluxos, uma thread obtenha o controle
+do lock. Fazendo com que as outras threads, ao chegar na seção crítica, sejam colocadas em uma fila de
+"threads adormecidas" esperando que a thread que assumiu o controle do lock o libere ao final da sua
+execução com o unlock. Esse tipo de bloqueio garante a atomicidade das operações, evitando corrida de
+dados na execução do programa concorrente.
+
+f) Como funciona a sincronização condicional com bloqueio (que usa as funções wait, signal e broadcast)?
+
+A sincronização condicional visa garantir que uma thread fique bloqueada enquanto uma determinada condição
+lógica da aplicação não for satisfeita. Para isso, as threads contam com variáveis de condição, primordiais
+para que as threads esperem (bloqueando-se) até que sejam sinalizadas (avisadas) por outra thread que a 
+condição lógica foi atendida. Definindo as funções wait, signal e broadcast:
+
+ - Wait: bloqueia a thread na fila de variável de condição;
+ - Signal: desbloqueia uma thread na fila da variável de condição;
+ - Broadcast: desbloqueia todas as threads que estão na fila de variável de condição;
+
+Agora, uma variável de confição SEMPRE é utilizada com uma variável lock! A thread usa o block lock para
+checar a condição lógica da aplicação e decidir por WAIT ou SIGNAL. E o lock é implicitamente liberado
+quando a thread é bloqueada e é implicitamente devolvido quando a thread retorna a execução do ponto de
+bloqueio.
+
+g) Por que mecanismos de sincronização e comunicação são necessários para a programação concorrente?
+
+Pois em alguns programas precisamos de certo controle sobre o acesso ao dado ou alguma lógica de execução
+baseada no valor do dado. Para evitar resultados indesejados e errados, por conta de problemas como a 
+condição de corrida.
