@@ -9,20 +9,27 @@
     A ideia é dividir a série em intervalos iguais entre as threads!
 */ 
 
-#define nThreads 3
+#define nThreads 4 //Optei por deixar o número de Threads fixo, mas porderíamos solicitar isso como entrada padrão.
 
 pthread_mutex_t mutex; //Inicia nossa variável de lock e unlock.
 
 long double pi = 0.0; //Inicia pi
 
+typedef struct {
+    int inicio;
+    int fim;
+} Intervalo;
+
 void* piBBP(void* arg){
 
-    int inicio = *(int *) arg;   
-    int n = *(int *) arg + (n/nThreads);
+    Intervalo *intervalo = (Intervalo *) arg;
+
+    int inicio = intervalo->inicio;
+    int fim = intervalo->fim;
 
     long double soma = 0.0;
 
-    for (int i = 0; i < n; i++) {
+    for (int i = inicio; i < fim; i++) {
         long double termo = (4.0 / (8*i + 1)) -
                         (2.0 / (8*i + 4)) -
                         (1.0 / (8*i + 5)) -
@@ -49,13 +56,21 @@ int main(int argc, char *argv[]) {
     int n = atoi(argv[1]);
 
     pthread_t threads[nThreads];
-    int tarefas[nThreads];
+    Intervalo intervalos[nThreads];
 
     pthread_mutex_init(&mutex, NULL);
 
+    int termosPorThread = n / nThreads;
+    int resto = n % nThreads;
+
     for (int i = 0; i < nThreads; i++) {
-        tarefas[i] = i * (n/nThreads);
-        pthread_create(&threads[i], NULL, piBBP, &tarefas[i]); 
+        intervalos[i].inicio = i * termosPorThread;
+        intervalos[i].fim = (i + 1) * termosPorThread;
+
+        if (i == nThreads - 1) {
+            intervalos[i].fim += resto;
+        }
+        pthread_create(&threads[i], NULL, piBBP, &intervalos[i]); 
     }
 
     for(int i = 0; i < nThreads; i++) {
