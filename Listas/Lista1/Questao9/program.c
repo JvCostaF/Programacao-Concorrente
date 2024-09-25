@@ -79,6 +79,9 @@ int main(int argc, char *argv[]){
     pthread_create(&T1, NULL, primeiraThread, NULL);
     pthread_create(&T2, NULL, segundaThread, NULL);
 
+    pthread_join(T1, NULL);
+    pthread_join(T2, NULL);
+
     pthread_mutex_destroy(&lock);
 
     pthread_cond_destroy(&condT1);
