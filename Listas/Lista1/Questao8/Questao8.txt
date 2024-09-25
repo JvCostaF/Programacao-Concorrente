@@ -1,10 +1,48 @@
-(a) Se duas threads acessarem as seções críticas elas vão se bloquear. 
+void *T0 (void *args) {               |   void *T1 (void *args) {
+ while(1) {                           |       while(1) {
+ querEntrar0 = 1;                     |        querEntrar1 = 1;
+ turno = 1;                           |        turno = 0;
+ while((querEntrar1==1) &&            |        while((querEntrar0==1) &&
+ (turno==1)) { ; }                    |           (turno==0)) { ; }
+ //..seção crítica                    |        //..seção crítica
+ querEntrar0 = 0;                     |        querEntrar1 = 0;
+ //..fora da seção crítica            |        //..fora da seção crítica
+  }}                                  |    }}
 
-(b) Em loop, ela ira bloquear e desbloquear o funcionamento da outra thread. Agora, a thread em si, não irá sofrer contenção, a não ser 
-que outra thread execute e a bloqueie com execução da seção crítica.
+(a) Para tentar acessar ao mesmo tempo a seção crítica temos que considerar que ambas deram false no while. Não existe exclusão mútua no
+código, então não vai existir uma fila de lock, então acredito que as duas threads vão acessar suas seções críticas e vão alterar as
+variáveis compartilhadas querEntrar0 e querEntrar1.
 
-(c) Nada vai acontecer. Não existe sincronização de acesso entre as threads.
+(b) Digamos que as threads T0 e T1 estejam executando, e T0 tente acessar sozinha a sua seção crítica ela irá repetir esse processo por 
+várias vezes enquanto a T1 não acessar a sua seção crítica e alterar querEntrar1. Pois a T0 só deixaria de tentar acessar sua seção
+crítica quando uma das sentenças do while dê false.
 
-(d)
+(c) Se a outra thread já estiver acessando a thread que tenta acessar irá conseguir, pois em teoria a outra thread vai estar alterando 
+a variável que quebra o while que garante que as threads não entrem na seção crítica. 
 
-(e)
+(d) A ideia da exclusão mútua é evitar que duas ou mais threads que estejam executando simultaneamente tenham acesso a um recurso 
+compartilhado. O código não garante isso, pois não faz uso das variáveis necessárias para "lockar" o acesso a esses recurusos 
+compartilhados. 
+
+(e) Sim. existem variáveis compartilhadas entre as threads, essas variáveis são responsáveis por decidir, por meio das sentenças, 
+se uma thread vai conseguir entrar na sua seção critíca, ou seja, analisando a T0:
+Ela faz uso da variável querEntrar1 em uma das sentenças do seu while, e enquanto o seu while for true, ela não entrará na sua seção crítica.
+Então, se ela for executada antes da T1 executar ela vai estar em Starvation, pois estará impedida de acessar um recurso compartilhado, 
+nesse caso a variável querEntrar0.
+
+--DEFINIÇÔES--
+
+1. Deadlock (Interbloqueio):
+
+O deadlock ocorre quando duas ou mais threads ou processos ficam presos em um ciclo, onde cada um está esperando por um recurso que o 
+outro possui, e nenhum pode continuar sua execução. Isso resulta em uma paralisação do sistema ou de parte dele.
+
+2. Starvation (Inanição):
+
+Ocorre quando uma thread ou processo está constantemente impedido de acessar um recurso porque outras threads estão sempre adquirindo 
+esses recursos antes. Mesmo que o sistema esteja funcionando, a thread afetada não consegue progredir.
+
+3. Livelock:
+
+O livelock é uma situação semelhante ao deadlock, mas em vez das threads ou processos estarem bloqueados, eles continuam a mudar de 
+estado ou realizar operações repetitivas sem fazer progresso. Eles continuam "vivos", mas não chegam a uma conclusão útil.
