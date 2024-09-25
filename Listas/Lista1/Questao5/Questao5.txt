@@ -1,0 +1,45 @@
+float saldo = 100.0
+pthread_mutex_t = l;
+
+void retira(float val){
+    pthread_mutex_lock(&l);
+    saldo = saldo - val;
+    pthread_mutex_unlock(&l);
+}
+
+float le(){
+    pthread_mutex_lock(&l);
+    float s = saldo;
+    pthread_mutex_unlock(&l);
+    return s;
+}
+
+void* tarefa(void* arg){
+    float val = *(float *) arg;
+    float meuSaldo = le();
+    if(meuSaldo>=val) retira(val);
+}
+
+Pergunta: O saldo pode ficar negativo?
+
+vamos supor que temos duas threads:
+
+pthread_create(tid, NULL, tarefa, 100); -> Thread 1
+pthread_create(tid, NULL, tarefa, 50); -> Thread 2
+
+Com isso, a thread 1 começa a executar tarefa e vai até o if(meuSaldo>=val), esse if vai ser true então ela passa para o retira(val),
+mas antes disso a thread 2 inicia e executa por completo, retirando 50 do saldo. Aqui o saldo passa a ser 50 e a thread 1 então
+continua sua execução, fazendo um retira no "novo" saldo, de tal forma que o saldo fique igual a -50.
+
+Até temos uma sincronização por bloquei da variável saldo e s, mas do jeito que está não garante que não possam ocorrer problemas
+como esse. Acredito que se um if fosse adicionado em retira, resolveríamos o problema.
+
+De tal modo que, retira ficasse assim:
+
+void retira(float val){
+    pthread_mutex_lock(&l);
+    if(saldo>=val){
+        saldo = saldo - val;
+    }
+    pthread_mutex_unlock(&l);
+}

@@ -1,0 +1,39 @@
+A ordem de execução deve ser lida da esquerda para direita.
+
+    Thread (Ação Executada) -> ...
+
+OBS: x sempre é iniciado igual a 0.
+
+p/ o valor 1:
+
+T1 (x=x-1) -> T2 (x=x+1) -> T3 (x=x+1) -> T3 if(x==1) -> T3 printf("%d", x) 
+
+T3 (x=x+1) -> T3 printf("%d", x)
+
+T2 (x=x+1) -> T2 (x=x-1) -> T3 (x=x+1) -> T3 if(x==1) -> T3 printf("%d", x)
+
+T1 (x=x-1) -> T1 (x=x+1) -> T1 (x=x-1) -> T3 (x=x+1) -> T3 if(x==1) -> T3 printf("%d", x)
+
+T1 (x=x-1) -> T1 (x=x+1) -> T2 (x=x+1) -> T2 (x=x-1) -> T3 (x=x+1) -> T3 if(x==1) -> T3 printf("%d", x)
+
+p/ o valor -1:
+
+T1 (x=x-1) -> T1 (x=x+1) -> T1 (x=x-1) -> T1 printf("%d", x)
+
+T2 (x=x+1) -> T2 (x=x-1) -> T1 (x=x-1) -> T1 (x=x+1) -> T1 (x=x-1) -> T1 printf("%d", x)
+
+p/ o valor 0: 
+
+T1 (x=x-1) -> T2 (x=x+1) -> T3 (x=x+1) -> T3 if(x==1) -> T2 (x=x-1) -> T3 printf("%d", x)
+
+T1 (x=x-1) -> T1 (x=x+1) -> T2 (x=x+1) -> T2 (x=x-1) -> T3 (x=x+1) -> T3 if(x==1) -> T1(x=x-1) -> T3 printf("%d", x)
+
+T1 (x=x-1) -> T2 (x=x+1) -> T1 (x=x+1) -> T2 (x=x-1) -> T3 (x=x+1) -> T3 if(x==1) -> T1(x=x-1) -> T3 printf("%d", x)
+
+p/ o valor 2: 
+
+T3 (x=x+1) -> T3 if(x==1) -> T2 (x=x+1) -> T3 printf("%d", x)
+
+T1 (x=x-1) -> T2 (x=x+1) -> T3 (x=x+1) -> T3 if(x==1) -> T1 (x=x+1) -> T3 printf("%d", x)
+
+Os valores -2, 3, -3, 4 e -4 não podem ser impressos pelas threads 1, 2 e 3.

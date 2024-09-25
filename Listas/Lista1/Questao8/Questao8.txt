@@ -1,0 +1,10 @@
+(a) Se duas threads acessarem as seções críticas elas vão se bloquear. 
+
+(b) Em loop, ela ira bloquear e desbloquear o funcionamento da outra thread. Agora, a thread em si, não irá sofrer contenção, a não ser 
+que outra thread execute e a bloqueie com execução da seção crítica.
+
+(c) Nada vai acontecer. Não existe sincronização de acesso entre as threads.
+
+(d)
+
+(e)
