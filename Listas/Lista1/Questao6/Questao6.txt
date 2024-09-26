@@ -1,0 +1,21 @@
+Aqui estamos analisando o padrão de Leitura/Escrita
+
+(a) Vamos analisar as condições, destacando o que cada um atende:
+
+Dentro de InicLeit()
+while(escr > 0)
+    pthread_cond_wait(&cond_leit, &mutex);
+
+Acima estamos validando que para ler, nenhum escritor pode estar escrevendo no momento.
+
+Dentro de InicEscr()
+while((leit>0) || (escr>0))
+    pthread_cond_wait(&cond_escr, &mutex);
+
+Acima estamos validando que se um escritor está escrevendo, não podemos ter nenhum leitor ou nenhum outro escritor.
+
+Por fim, dentro de FimLeit()
+if(leit==0)
+    pthread_cond_wait(&cond_escr, &mutex);
+
+Acima estamos verificando se não temos ninguém para ler devemos deixar a thread "inativa".
