@@ -22,7 +22,7 @@ crítica quando uma das sentenças do while dê false.
 compartilhado. O códigogarante isso, pois faz uso das variáveis necessárias para "lockar" o acesso a esses recurusos 
 compartilhados, mesmo que não faça uso direto de variáveis de lock da biblioteca pthread.h.
 
-(e) 
+(e) Não!
 
 --DEFINIÇÔES--
 
