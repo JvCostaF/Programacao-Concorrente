@@ -24,7 +24,11 @@ pthread_cond_t cond_inse, cond_reti;
 void *Insere(tElemento elem){
     pthread_mutex_lock(&mutex);
 
-    while(count <= N){
+    if(BufferCheio()){
+        pthread_cond_wait(&cond_inse, &mutex);
+    }
+
+    while(count <= N){ //Garante que vamos inserir até atingir o máximo do Buffer!
         pthread_cond_wait(&cond_inse, &mutex);
     }
     count++;
