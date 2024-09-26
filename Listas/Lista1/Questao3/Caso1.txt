@@ -1,7 +1,7 @@
 a) A sequência que resultaria em um erro no MySQL seria:
 
     S1 -> S3 -> S2, ou seja, durante a execução dos fluxos houve um entrelaçamentos entre as instruções
-    de máquina fazendo com que a sentença 1 verifica-se que a proc_info era diferente de NULL e logo em
+    de máquina fazendo com que a sentença 1 verifica que a proc_info era diferente de NULL e logo em
     seguida a sentença 3 atribuiu NULL a proc_info, o que vai resultar em um erro na execução da sentença
     2.
 
