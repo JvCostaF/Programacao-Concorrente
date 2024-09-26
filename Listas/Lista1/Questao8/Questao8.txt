@@ -9,26 +9,20 @@ void *T0 (void *args) {               |   void *T1 (void *args) {
  //..fora da seção crítica            |        //..fora da seção crítica
   }}                                  |    }}
 
-(a) Para tentar acessar ao mesmo tempo a seção crítica temos que considerar que ambas deram false no while. Não existe exclusão mútua no
-código, então não vai existir uma fila de lock, então acredito que as duas threads vão acessar suas seções críticas e vão alterar as
-variáveis compartilhadas querEntrar0 e querEntrar1.
+(a) A variável turno, lida com esse caso em que as duas chegam juntas, ela vai garantir que se as duas cheragem juntas apenas uma irá 
+executar a seção crítica.
 
 (b) Digamos que as threads T0 e T1 estejam executando, e T0 tente acessar sozinha a sua seção crítica ela irá repetir esse processo por 
 várias vezes enquanto a T1 não acessar a sua seção crítica e alterar querEntrar1. Pois a T0 só deixaria de tentar acessar sua seção
 crítica quando uma das sentenças do while dê false.
 
-(c) Se a outra thread já estiver acessando a thread que tenta acessar irá conseguir, pois em teoria a outra thread vai estar alterando 
-a variável que quebra o while que garante que as threads não entrem na seção crítica. 
+(c) A thread que estava esperando terá prioridade para entrar na seção crítica.
 
 (d) A ideia da exclusão mútua é evitar que duas ou mais threads que estejam executando simultaneamente tenham acesso a um recurso 
-compartilhado. O código não garante isso, pois não faz uso das variáveis necessárias para "lockar" o acesso a esses recurusos 
-compartilhados. 
+compartilhado. O códigogarante isso, pois faz uso das variáveis necessárias para "lockar" o acesso a esses recurusos 
+compartilhados, mesmo que não faça uso direto de variáveis de lock da biblioteca pthread.h.
 
-(e) Sim. existem variáveis compartilhadas entre as threads, essas variáveis são responsáveis por decidir, por meio das sentenças, 
-se uma thread vai conseguir entrar na sua seção critíca, ou seja, analisando a T0:
-Ela faz uso da variável querEntrar1 em uma das sentenças do seu while, e enquanto o seu while for true, ela não entrará na sua seção crítica.
-Então, se ela for executada antes da T1 executar ela vai estar em Starvation, pois estará impedida de acessar um recurso compartilhado, 
-nesse caso a variável querEntrar0.
+(e) 
 
 --DEFINIÇÔES--
 
