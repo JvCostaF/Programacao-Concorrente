@@ -23,7 +23,8 @@ pthread_cond_t cond_inse, cond_reti;
 
 void *Insere(tElemento elem){
     pthread_mutex_lock(&mutex);
-    while(count == N){
+
+    while(count <= N){
         pthread_cond_wait(&cond_inse, &mutex);
     }
     count++;
@@ -44,22 +45,4 @@ tElemento Retira(void){
     pthread_mutex_unlock(&mutex);
     pthread_cond_signal(&cond_inse);
     return elem;
-}
-
-void *produtor(void * arg){
-    tElemento elem;
-    while(count <= N){
-        elem = produzElemento();
-        Insere(elem);
-    }
-    pthread_exit(NULL);
-}
-
-void *consumidor(void * arg) {
-    tElemento elemento;
-    while(REPETE) {
-        elemento = Retira();
-        processaElemento(elemento);
-    }
-    pthread_exit(NULL);
 }
