@@ -1,0 +1,14 @@
+Bom, parece que temos outra situação de Leitura/Escrita. Onde temos como tarefas elementares: ler dados na base, processar os dados e 
+escrever dados na base. Precisamos pensar em como essa situação poderia fazer uso de uma solução concorrente, garantindo as condições
+de Leitura/Escrita. Algumas dessas tarefas podem ser executadas de maneira concorrente, como ler dados na base e processar os dados. 
+
+Digamos que nosso programa seja executado com três threads, onde uma lê os dados na base, uma processa os dados e outra escreve os
+dados na base. 
+    - Leitores podem ler simultaneamente, então poderíamos ter mais de um leitor;
+    - Processar os dados não envolve nem leitura e nem escrita, então pode ser executado junto com as outras tarefas;
+    - Escritores só podem escrever quando apenas um escritor estiver escrevendo por vez,  ou seja, não podemos ter casos onde mais de
+    um escritor esteja escrevendo e caso um escritor esteja executando não podemos ter leitores lendo dados na base;
+
+Respetaindo essas condições, é possível projetar uma solução de Leitura/Escrita que tire proveito da concorrência aumentando talvez, 
+aumentando a eficiência da nossa aplicação. Acredito que a solução possa conter três fluxos, com dois podendo ser executados de
+maneira concorrente.

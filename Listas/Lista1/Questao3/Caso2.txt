@@ -4,7 +4,7 @@ variável mThread ser inicializada pela Thread 1.
 As mudanças propostas:
 
 pthread_mutex_t mutex;
-pthread_cond_t condUtilizar, condNaoUtilizar;
+pthread_cond_t condUtilizar;
 
 int podeUsar = 0;
 
@@ -27,5 +27,6 @@ vod mMain(...) {
         mState = mThread->State;
         ...
     }
+    pthread_mutex_unlock(&mutex);
     
 }

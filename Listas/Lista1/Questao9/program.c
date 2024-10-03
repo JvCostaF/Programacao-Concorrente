@@ -46,7 +46,7 @@ void *primeiraThread(void *arg) {
 
 void *segundaThread(void *arg) {
     pthread_mutex_lock(&lock);
-    pthread_cond_wait(&condT1, &lock);
+    pthread_cond_wait(&condT1, &lock); //Para deixar a thread 2 em wait caso ela execute primeiro que a thread 1.
 
     printf("Thread 2: oi, nao estou\n");
 
