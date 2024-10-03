@@ -29,7 +29,7 @@ void EntraLeitura() {
     }
 
     leitores++;
-    printf("Existem %d leitores.\n", leitores);
+    printf("Existem %d leitor(es).\n", leitores);
     pthread_mutex_unlock(&mutex);
 }
 
@@ -47,13 +47,13 @@ void EntraEscrita() {
 
     querendoEscrever++;
     while(leitores > 0 || escritores > 0) {
-        printf("Existem %d escritores ou %d leitores trabalhando, agurade!\n", escritores, leitores);
+        printf("Existem %d escritor(es) ou %d leitor(es) trabalhando, aguarde!\n", escritores, leitores);
         pthread_cond_wait(&cond_escrever, &mutex);
     }
 
     escritores++;
     querendoEscrever--;
-    printf("Existem %d escritores.\n", escritores);
+    printf("Existem %d escritor(es).\n", escritores);
     pthread_mutex_unlock(&mutex);
 }
 
@@ -77,7 +77,6 @@ void* tarefa(void* arg) {
    //realiza operacoes de consulta (98%), insercao (1%) e remocao (1%)
    for(long int i=id; i<QTDE_OPS; i+=nthreads) {
       op = rand() % 100;
-      //printf("%d\n", op);
       if(op<98) {
 	      EntraLeitura();    
           Member(i%MAX_VALUE, head_p);   /* Ignore return value */

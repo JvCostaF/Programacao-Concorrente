@@ -1,0 +1,8 @@
+Atividade 2)
+
+4. Não quer dizer que por ter leitura e escrita o rwlocke será melhor, precisamos entender qual o
+cenário que estamos processando. 
+
+Atividade 3)
+
+Colocar logs para conseguir debugar se o requisito de priorizar escritores está sendo atendido.
