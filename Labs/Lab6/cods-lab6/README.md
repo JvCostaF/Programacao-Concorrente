@@ -11,6 +11,13 @@ Tomei a liberdade e defini novas porcentagens de operações de consulta 40%, in
 
 # Sobre as funções presentes no **entrada_saida.h**:
 
+Algumas variáveis de condição foram criadas;
+
+1) `pthread_cond_t cond_ler, cond_escrever;`
+2) `int leitores = 0; int escritores = 0; int querendoEscrever = 0; int leitoresAguardando = 0;` 
+
+Essas variáveis são incrementadas e decrementadas dentro das funções definidas respeitando o padrão thread-safe. 
+
 Implementei quatro funções:
 
 1) EntradaLeitura(): As threads de leitura executam quando não temos nenhum escritor escrevendo e ou querendo escrever, caso 
