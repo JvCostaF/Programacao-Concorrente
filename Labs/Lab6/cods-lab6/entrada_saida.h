@@ -34,6 +34,7 @@ void SaiLeitura() {
     printf("Leitor saindo.\n");
     printf("Leitores aguardando: %d\n", leitoresAguardando);
     leitores--;
+    
     pthread_cond_broadcast(&cond_escrever);
     pthread_cond_broadcast(&cond_ler);
     pthread_mutex_unlock(&mutex);
