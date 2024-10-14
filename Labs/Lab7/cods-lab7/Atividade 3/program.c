@@ -57,9 +57,6 @@ void *Thread1(void *arg) {
     //ImprimeBuffer(b);
     printf("Thread 1 terminou\n");
 
-    // free(b->Buffer);
-    // free(b);
-
     pthread_exit((void *) b);
 
 }
@@ -80,7 +77,7 @@ void *Thread2(void *arg) {
 
     Buffer2->bufferSize = Buffer1->bufferSize+qtdDeQuebraDeLinhas; // Define tamanho do Buffer 2 igual ao do Buffer 1 + qtd de quebra de linhas.
 
-    int n = 0; // Representa um indice no Buffer 2.
+    int n = 0;
 
     int caracteresLidos = 0;
 
@@ -88,15 +85,16 @@ void *Thread2(void *arg) {
 
     // Primeiro processo, insere \n após 2n+1 caracteres
     for (int i = 0; i < Buffer1->bufferSize; i++) {
-        Buffer2->Buffer[caracteresLidos++] = Buffer1->Buffer[i];  // Copia o caractere de Buffer1 para Buffer2
+        Buffer2->Buffer[caracteresLidos++] = Buffer1->Buffer[i];
 
-        if (caracteresLidos == indice) {  // Se atingiu o número correto de caracteres
-            Buffer2->Buffer[caracteresLidos++] = '\n'; // Adiciona a quebra de linha
+        if (caracteresLidos == indice && caracteresLidos < Buffer2->bufferSize) {  // Se atingiu o número correto de caracteres.
+            Buffer2->Buffer[caracteresLidos++] = '\n'; // Adiciona a quebra de linha.
             n++;
             if (n <= 10) {
-                indice = caracteresLidos + (2 * n + 1); // Atualiza o próximo ponto de quebra
+                indice = caracteresLidos + (2 * n + 1); // Atualiza o próximo ponto de quebra de linha.
             } else {
-                break; // Sai do loop quando n > 10
+                indice = caracteresLidos + 10;
+                // Sai do loop quando n > 10.
             }
         }
     }
@@ -107,11 +105,11 @@ void *Thread2(void *arg) {
             Buffer2->Buffer[caracteresLidos++] = Buffer1->Buffer[caracteresLidos];
         }
         if (caracteresLidos < Buffer1->bufferSize) {
-            Buffer2->Buffer[caracteresLidos++] = '\n';  // Adiciona nova linha após 10 caracteres
+            Buffer2->Buffer[caracteresLidos++] = '\n';  // Adiciona nova linha após 10 caracteres.
         }
     }
 
-    // Garante que a última linha sempre termine com '\n' se o último grupo de 10 caracteres não fez isso
+    // Garante que a última linha sempre termine com '\n' se o último grupo de 10 caracteres não fez isso.
     if (Buffer2->Buffer[caracteresLidos - 1] != '\n') {
         Buffer2->Buffer[caracteresLidos++] = '\n';
     }
@@ -140,6 +138,7 @@ void *Thread3(void *arg) {
 
 
     printf("Conteúdo do Buffer 2:\n");
+    printf("\n");
     //printf("[");
     for (int i = 0; i < Buffer->bufferSize; i++) {
         printf("%c", Buffer->Buffer[i]);  // Imprime cada caractere do buffer
@@ -227,6 +226,8 @@ int main(int argc, char *argv[]) {
     //     printf("%s", linha);
     // }
     // printf("\n");
+
+    // Liberando Buffer 1 e Buffer 2
 
     free(Buffer1->Buffer);
     free(Buffer1);
