@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"sync"
 )
 
 /*
@@ -35,12 +36,6 @@ func isPrimo(n int64) bool {
 	return true
 }
 
-// func routine(id int, ch <- chan int) bool{
-// 	for n := range ch {
-// 		return isPrimo(n)
-// 	}
-// }
-
 /*
 Gera um numero aleatorio definido dentro do intervalo [min, max]
 */
@@ -50,38 +45,62 @@ func randRange(min, max int) int {
 
 func main() {
 
-	// Testando funcao isPrimo
-	// numero := int64(40)
+	channel := make(chan int)
 
-	// channel := make(chan []int)
+	var wg sync.WaitGroup //Sincronizacao para esperar todas as goroutines terminarem
+	var mutex sync.Mutex  //Sincronizacao para exclusao mutua da variavel qtdPrimos
 
-	var qtdRoutines int
-	var seqSize int
+	var qtdRoutines int //Quantidade de goroutines
+	var seqSize int     //Tamanho da sequencia de numeros inteiros
 	qtdPrimos := 0
 
 	fmt.Println("Digite o tamanho da sequencia de numeros inteiros: ")
-	if _, erro := fmt.Scanf("%d", &seqSize); erro != nil {
+	if _, erro := fmt.Scan(&seqSize); erro != nil {
 		fmt.Println("Erro ao ler entrada!", erro)
 		return
 	}
 
 	fmt.Println("Digite a quantidade de Routines: ")
-	if _, erro := fmt.Scanf("%d", &qtdRoutines); erro != nil {
+	if _, erro := fmt.Scan(&qtdRoutines); erro != nil {
 		fmt.Println("Erro ao ler entrada!", erro)
 		return
 	}
 
 	sequencia := make([]int, seqSize)
 
-	for i := 0; i < seqSize; i++ {
-		sequencia[i] = randRange(0, 100)
-
-		if isPrimo(int64(sequencia[i])) {
-			qtdPrimos++
+	go func() {
+		for i := 0; i < seqSize; i++ {
+			sequencia[i] = randRange(0, 100)
+			channel <- sequencia[i]
 		}
+		close(channel)
+	}()
 
+	for r := 0; r < qtdRoutines; r++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for n := range channel {
+				if isPrimo(int64(n)) {
+					mutex.Lock()
+					qtdPrimos++
+					mutex.Unlock()
+				}
+			}
+		}()
 	}
+
+	wg.Wait() //Precisamos esperar todas as goroutine terminarem
+
 	fmt.Println(sequencia)
 	fmt.Println("Quantidade de numeros primos: ", qtdPrimos)
 
 }
+
+/* Links Utilizados
+https://golang.cafe/blog/golang-random-number-generator.html
+https://stackoverflow.com/questions/23577091/generating-random-numbers-over-a-range-in-go
+https://stackoverflow.com/questions/24703943/passing-a-slice-into-a-channel
+https://victoriametrics.com/blog/go-sync-mutex/
+https://go.dev/tour/concurrency/9
+*/
