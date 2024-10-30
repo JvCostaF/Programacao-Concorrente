@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"sync"
 )
 
 /*
@@ -47,12 +46,10 @@ func main() {
 
 	channel := make(chan int)
 
-	var wg sync.WaitGroup //Sincronizacao para esperar todas as goroutines terminarem
-	var mutex sync.Mutex  //Sincronizacao para exclusao mutua da variavel qtdPrimos
+	done := make(chan int)
 
 	var qtdRoutines int //Quantidade de goroutines
 	var seqSize int     //Tamanho da sequencia de numeros inteiros
-	qtdPrimos := 0
 
 	fmt.Println("Digite o tamanho da sequencia de numeros inteiros: ")
 	if _, erro := fmt.Scan(&seqSize); erro != nil {
@@ -69,7 +66,8 @@ func main() {
 	sequencia := make([]int, seqSize)
 
 	/*
-		Adicionei cada numero aleatorio da sequencia no canal
+		Adicionei cada numero aleatorio da sequencia no canal, veja que numeros aleatorios podem ser
+		gerados, mas nao se preocupe, se for um numero primo duplicado a contagem sera feita corretamente.
 	*/
 	go func() {
 		for i := 0; i < seqSize; i++ {
@@ -80,20 +78,21 @@ func main() {
 	}()
 
 	for r := 0; r < qtdRoutines; r++ {
-		wg.Add(1)
 		go func() {
-			defer wg.Done()
+			contPrimosGoRoutine := 0
 			for n := range channel {
 				if isPrimo(int64(n)) {
-					mutex.Lock()
-					qtdPrimos++
-					mutex.Unlock()
+					contPrimosGoRoutine++
 				}
 			}
+			done <- contPrimosGoRoutine
 		}()
 	}
 
-	wg.Wait() //Precisamos esperar todas as goroutine terminarem
+	qtdPrimos := 0
+	for i := 0; i < qtdRoutines; i++ {
+		qtdPrimos += <-done
+	}
 
 	fmt.Println(sequencia)
 	fmt.Println("Quantidade de numeros primos: ", qtdPrimos)
