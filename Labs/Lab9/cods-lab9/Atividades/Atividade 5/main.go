@@ -48,20 +48,28 @@ func main() {
 
 	done := make(chan int)
 
-	var qtdRoutines int //Quantidade de goroutines
-	var seqSize int     //Tamanho da sequencia de numeros inteiros
+	// var qtdRoutines int Quantidade de goroutines
+	// var seqSize int     Tamanho da sequencia de numeros inteiros
 
-	fmt.Println("Digite o tamanho da sequencia de numeros inteiros: ")
-	if _, erro := fmt.Scan(&seqSize); erro != nil {
-		fmt.Println("Erro ao ler entrada!", erro)
-		return
-	}
+	qtdRoutines := 8 //Quantidade de goroutines
+	seqSize := 200   //Tamanho da sequencia de numeros inteiros
 
-	fmt.Println("Digite a quantidade de Routines: ")
-	if _, erro := fmt.Scan(&qtdRoutines); erro != nil {
-		fmt.Println("Erro ao ler entrada!", erro)
-		return
-	}
+	/*
+		A sequencia com 100 numeros (de 1 ate 99) tem 25 primos, ja a sequencia com 200 numeros (de 1 ate 199)
+		tem 46 primos.
+	*/
+
+	// fmt.Println("Digite o tamanho da sequencia de numeros inteiros: ")
+	// if _, erro := fmt.Scan(&seqSize); erro != nil {
+	// 	fmt.Println("Erro ao ler entrada!", erro)
+	// 	return
+	// }
+
+	// fmt.Println("Digite a quantidade de Routines: ")
+	// if _, erro := fmt.Scan(&qtdRoutines); erro != nil {
+	// 	fmt.Println("Erro ao ler entrada!", erro)
+	// 	return
+	// }
 
 	sequencia := make([]int, seqSize)
 
@@ -70,8 +78,8 @@ func main() {
 		gerados, mas nao se preocupe, se for um numero primo duplicado a contagem sera feita corretamente.
 	*/
 	go func() {
-		for i := 0; i < seqSize; i++ {
-			sequencia[i] = randRange(0, 100)
+		for i := 1; i < seqSize; i++ {
+			sequencia[i] = i //randRange(0, 100)
 			channel <- sequencia[i]
 		}
 		close(channel)
