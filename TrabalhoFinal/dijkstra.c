@@ -92,7 +92,7 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice raiz) {
 
 int main(int argc, char* argv[])
 {
-    if (argc < 2) {
+    if (argc < 3) {
         fprintf(stderr, "Digite a dimensao do grafo e o arquivo de entrada\n", argv[0]);
         return 1;
     }
