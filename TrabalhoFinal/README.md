@@ -1,7 +1,7 @@
 # Trabalho Final - Programação Concorrete
 Alunos: 
 - João Víctor da Costa Farias - 120014876
-- Thalita Freitas Silva - 
+- Thalita de Freitas Silva - 120048493
 
 ## Proposta do Trabalho
 Implementar o algoritmo de **Dijkstra** com uso de concorrência na linguagem C. 
