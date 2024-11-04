@@ -37,7 +37,7 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice raiz) {
     
     //Inicialmente, todos os vertices precisam ter distRaiz = INFINITO, antecessor = NULL, jaVisitado = 0 e o seu proprio id
     for(int i = 0; i < qtdVertices; i++){
-        if(i == 0){
+        if(i == raiz.id - 'A'){
             vertices[i] = raiz;
             continue;
         }
@@ -48,7 +48,7 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice raiz) {
     }
 
     //Para validar os valores iniciais
-    printf("Antes de rodar o algoritmo!\n");
+    printf("----- Antes de rodar o algoritmo!\n");
     for(int j = 0; j < qtdVertices; j++){
         printf("Vertice: %c\n", vertices[j].id);
         printf("Distancia para a Raiz: %d\n", vertices[j].distRaiz);
@@ -76,7 +76,7 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice raiz) {
         }
     }
 
-    printf("Depois de rodar o algoritmo!\n");
+    printf("----- Depois de rodar o algoritmo!\n");
     // Imprime o estado final dos vértices
     for (int j = 0; j < qtdVertices; j++) {
         printf("Vertice: %c\n", vertices[j].id);
@@ -92,12 +92,18 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice raiz) {
 
 int main(int argc, char* argv[])
 {
-    if (argc < 3) {
-        fprintf(stderr, "Digite a dimensao do grafo e o arquivo de entrada\n", argv[0]);
+    if (argc < 4) {
+        fprintf(stderr, "Digite a dimensao do grafo, o arquivo de entrada e o indice do vertice raiz.\n", argv[0]);
         return 1;
     }
 
     int dimensao = atoi(argv[1]);
+    int indiceRaiz = atoi(argv[3]);
+
+    if (indiceRaiz<0 || indiceRaiz>=dimensao) {
+        fprintf(stderr, "Indice do vertice raiz invalido!\n");
+    }
+    
 
     FILE *file = fopen(argv[2], "r");
     if (file == NULL) {
@@ -137,7 +143,7 @@ int main(int argc, char* argv[])
     
     //Criando o vértice raiz
     Vertice raiz;
-    raiz.id = 'A'; 
+    raiz.id = 'A' + indiceRaiz; 
     raiz.distRaiz = 0; // Inicializa a distância da raiz como 0
     raiz.antecessor = '\0'; // Sem antecessor inicialmente
     raiz.jaVisitado = 0; // Marca como não visitado
