@@ -16,6 +16,16 @@ typedef struct {
     char id;
 } Vertice;
 
+void imprimeVertices(MatrizDeAdjacencias *grafo, Vertice *vertices) {
+    int qtdVertices = grafo->linhas;
+    for(int j = 0; j < qtdVertices; j++){
+        printf("Vertice: %c\n", vertices[j].id);
+        printf("Distancia para a Raiz: %d\n", vertices[j].distRaiz);
+        printf("Antecessor: %c\n", vertices[j].antecessor == '\0' ? ' ' : vertices[j].antecessor);
+        printf("\n");
+    }
+}
+
 int menorDistancia(Vertice *vertices, int qtdVertices) {
     int minimo = INT_MAX;
     int indVerticeMenorPeso;
@@ -30,10 +40,10 @@ int menorDistancia(Vertice *vertices, int qtdVertices) {
     return indVerticeMenorPeso;
 }
 
-void dijkstra(MatrizDeAdjacencias *grafo, Vertice raiz) {
+
+void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int verticeFinal) {
 
     int qtdVertices = grafo->linhas;
-    Vertice *vertices = malloc(qtdVertices * sizeof(Vertice));
     
     //Inicialmente, todos os vertices precisam ter distRaiz = INFINITO, antecessor = NULL, jaVisitado = 0 e o seu proprio id
     for(int i = 0; i < qtdVertices; i++){
@@ -47,14 +57,7 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice raiz) {
         vertices[i].id = 'A' + i;
     }
 
-    //Para validar os valores iniciais
-    printf("----- Antes de rodar o algoritmo!\n");
-    for(int j = 0; j < qtdVertices; j++){
-        printf("Vertice: %c\n", vertices[j].id);
-        printf("Distancia para a Raiz: %d\n", vertices[j].distRaiz);
-        printf("Antecessor: %c\n", vertices[j].antecessor == '\0' ? ' ' : vertices[j].antecessor);
-        printf("\n");
-    }
+    //imprimeVertices(grafo, vertices);
 
     // Executa o algoritmo de Dijkstra
     for (int count = 0; count < qtdVertices - 1; count++) {
@@ -76,14 +79,43 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice raiz) {
         }
     }
 
-    printf("----- Depois de rodar o algoritmo!\n");
-    // Imprime o estado final dos vértices
-    for (int j = 0; j < qtdVertices; j++) {
-        printf("Vertice: %c\n", vertices[j].id);
-        printf("Distancia da raiz: %d\n", vertices[j].distRaiz);
-        printf("Antecessor: %c\n", vertices[j].antecessor == '\0' ? ' ' : vertices[j].antecessor);
-        printf("\n");
+    // Caso seja um grafo desconexo
+    // Se a gente definir uma boa probabilidade na hora de gerar os grafos com o gerador teremmos poucos casos de grafos desconexos, mas vale testar mesmo!
+    if (vertices[verticeFinal].distRaiz==INT_MAX) {
+            printf("Nao ha caminho minimo entre os vertices fornecidos!\n");
+            return;
     }
+
+    // Reconstruindo o caminho mínimo
+    int caminho[qtdVertices];
+    int indiceCaminho = 0;
+    int v = verticeFinal;
+    int pesoTotal = 0;
+    while (v != raiz.id - 'A') {
+        caminho[indiceCaminho] = v;
+        indiceCaminho++;
+        v = vertices[v].antecessor - 'A';
+    }
+    caminho[indiceCaminho++] = raiz.id - 'A';
+
+
+    for (int j = 0; j < qtdVertices; j++) {
+        if (vertices[j].id==vertices[verticeFinal].id) {
+            pesoTotal=vertices[verticeFinal].distRaiz;
+        }
+    }
+
+    //imprimeVertices(grafo, vertices);
+
+    // Imprimindo o caminho mínimo
+    printf("-----Resultados da execucao do algoritmo-----\n");
+    printf("Caminho Minimo: ");
+    for (int i = indiceCaminho - 1; i >= 0; i--) {
+        printf("%c ", 'A' + caminho[i]);
+    }
+    printf("\n");
+    printf("Tamanho do caminho: %d\n", pesoTotal);
+
 
     free(vertices);
 
@@ -92,16 +124,21 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice raiz) {
 
 int main(int argc, char* argv[])
 {
-    if (argc < 4) {
-        fprintf(stderr, "Digite a dimensao do grafo, o arquivo de entrada e o indice do vertice raiz.\n", argv[0]);
+    if (argc < 5) {
+        fprintf(stderr, "Digite a dimensao do grafo, o arquivo de entrada, o indice do vertice raiz e o indice do vertice final.\n", argv[0]);
         return 1;
     }
 
     int dimensao = atoi(argv[1]);
     int indiceRaiz = atoi(argv[3]);
+    int indiceFinal = atoi(argv[4]);
 
     if (indiceRaiz<0 || indiceRaiz>=dimensao) {
         fprintf(stderr, "Indice do vertice raiz invalido!\n");
+    }
+
+    if (indiceFinal<0 || indiceFinal>=dimensao) {
+        fprintf(stderr, "Indice do vertice final invalido!\n");
     }
     
 
@@ -140,6 +177,13 @@ int main(int argc, char* argv[])
         }
         printf("\n");
     }
+
+    // Criando o vetor de vértices
+    Vertice *vertices = malloc(dimensao * sizeof(Vertice));
+    if (vertices == NULL) {
+        fprintf(stderr, "Erro ao alocar memória para os vértices.\n");
+        return 1;
+    }
     
     //Criando o vértice raiz
     Vertice raiz;
@@ -148,9 +192,10 @@ int main(int argc, char* argv[])
     raiz.antecessor = '\0'; // Sem antecessor inicialmente
     raiz.jaVisitado = 0; // Marca como não visitado
 
-    dijkstra(&grafo, raiz);
+    dijkstra(&grafo, vertices, raiz, indiceFinal);
 
     free(grafo.dados);
+    free(vertices);
 
     return 0;
 }
