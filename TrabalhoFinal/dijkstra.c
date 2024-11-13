@@ -16,6 +16,16 @@ typedef struct {
     char id;
 } Vertice;
 
+void imprimeVertices(MatrizDeAdjacencias *grafo, Vertice *vertices) {
+    int qtdVertices = grafo->linhas;
+    for(int j = 0; j < qtdVertices; j++){
+        printf("Vertice: %c\n", vertices[j].id);
+        printf("Distancia para a Raiz: %d\n", vertices[j].distRaiz);
+        printf("Antecessor: %c\n", vertices[j].antecessor == '\0' ? ' ' : vertices[j].antecessor);
+        printf("\n");
+    }
+}
+
 int menorDistancia(Vertice *vertices, int qtdVertices) {
     int minimo = INT_MAX;
     int indVerticeMenorPeso;
@@ -47,14 +57,7 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int v
         vertices[i].id = 'A' + i;
     }
 
-    //Para validar os valores iniciais
-    printf("----- Antes de rodar o algoritmo!\n");
-    for(int j = 0; j < qtdVertices; j++){
-        printf("Vertice: %c\n", vertices[j].id);
-        printf("Distancia para a Raiz: %d\n", vertices[j].distRaiz);
-        printf("Antecessor: %c\n", vertices[j].antecessor == '\0' ? ' ' : vertices[j].antecessor);
-        printf("\n");
-    }
+    //imprimeVertices(grafo, vertices);
 
     // Executa o algoritmo de Dijkstra
     for (int count = 0; count < qtdVertices - 1; count++) {
@@ -77,6 +80,7 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int v
     }
 
     // Caso seja um grafo desconexo
+    // Se a gente definir uma boa probabilidade na hora de gerar os grafos com o gerador teremmos poucos casos de grafos desconexos, mas vale testar mesmo!
     if (vertices[verticeFinal].distRaiz==INT_MAX) {
             printf("Nao ha caminho minimo entre os vertices fornecidos!\n");
             return;
@@ -95,25 +99,22 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int v
     caminho[indiceCaminho++] = raiz.id - 'A';
 
 
-    printf("----- Depois de rodar o algoritmo!\n");
-    // Imprime o estado final dos vértices
     for (int j = 0; j < qtdVertices; j++) {
         if (vertices[j].id==vertices[verticeFinal].id) {
             pesoTotal=vertices[verticeFinal].distRaiz;
         }
-        
-        printf("Vertice: %c\n", vertices[j].id);
-        printf("Distancia da raiz: %d\n", vertices[j].distRaiz);
-        printf("Antecessor: %c\n", vertices[j].antecessor == '\0' ? ' ' : vertices[j].antecessor);
-        printf("\n");
     }
 
+    //imprimeVertices(grafo, vertices);
+
     // Imprimindo o caminho mínimo
-    printf("----- Caminho minimo, de tamanho: %d\n", pesoTotal);
+    printf("-----Resultados da execucao do algoritmo-----\n");
+    printf("Caminho Minimo: ");
     for (int i = indiceCaminho - 1; i >= 0; i--) {
         printf("%c ", 'A' + caminho[i]);
     }
     printf("\n");
+    printf("Tamanho do caminho: %d\n", pesoTotal);
 
 
     free(vertices);
