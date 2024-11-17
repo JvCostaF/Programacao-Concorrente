@@ -20,14 +20,14 @@ def salvar_matriz_em_txt(matriz, nome_arquivo):
     np.savetxt(nome_arquivo, matriz, fmt='%d')
 
 # Parâmetros do grafo
-n = 10000 # Número de vértices
-p = 0.5  # Probabilidade de arestas
+n =  # Número de vértices
+p =  # Probabilidade de arestas
 
 # Gera o grafo e a matriz de adjacência
 G, matriz = gerar_grafo(n, p)
 
 # Salva a matriz em um arquivo .txt
-salvar_matriz_em_txt(matriz, 'matriz10000x10000.txt')
+salvar_matriz_em_txt(matriz, '')
 
 # Printa o grafo usando o pypltu
 # nx.draw(G, with_labels=True, node_color='lightblue', edge_color='gray')
