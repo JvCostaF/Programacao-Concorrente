@@ -11,17 +11,17 @@ typedef struct {
 
 typedef struct {
     int distRaiz;
-    char antecessor;
+    int antecessor;
     int jaVisitado;
-    char id;
+    int id;
 } Vertice;
 
 void imprimeVertices(MatrizDeAdjacencias *grafo, Vertice *vertices) {
     int qtdVertices = grafo->linhas;
     for(int j = 0; j < qtdVertices; j++){
-        printf("Vertice: %c\n", vertices[j].id);
+        printf("Vertice: %d\n", vertices[j].id);
         printf("Distancia para a Raiz: %d\n", vertices[j].distRaiz);
-        printf("Antecessor: %c\n", vertices[j].antecessor == '\0' ? ' ' : vertices[j].antecessor);
+        printf("Antecessor: %d\n", vertices[j].antecessor);
         printf("\n");
     }
 }
@@ -47,14 +47,14 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int v
     
     //Inicialmente, todos os vertices precisam ter distRaiz = INFINITO, antecessor = NULL, jaVisitado = 0 e o seu proprio id
     for(int i = 0; i < qtdVertices; i++){
-        if(i == raiz.id - 'A'){
+        if(i == raiz.id){
             vertices[i] = raiz;
             continue;
         }
         vertices[i].distRaiz = INT_MAX; //Define como o maior valor inteiro possivel
         vertices[i].antecessor = '\0';
         vertices[i].jaVisitado = 0;
-        vertices[i].id = 'A' + i;
+        vertices[i].id = i;
     }
 
     //imprimeVertices(grafo, vertices);
@@ -91,12 +91,12 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int v
     int indiceCaminho = 0;
     int v = verticeFinal;
     int pesoTotal = 0;
-    while (v != raiz.id - 'A') {
+    while (v != raiz.id) {
         caminho[indiceCaminho] = v;
         indiceCaminho++;
-        v = vertices[v].antecessor - 'A';
+        v = vertices[v].antecessor;
     }
-    caminho[indiceCaminho++] = raiz.id - 'A';
+    caminho[indiceCaminho++] = raiz.id;
 
 
     for (int j = 0; j < qtdVertices; j++) {
@@ -111,13 +111,10 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int v
     printf("-----Resultados da execucao do algoritmo-----\n");
     printf("Caminho Minimo: ");
     for (int i = indiceCaminho - 1; i >= 0; i--) {
-        printf("%c ", 'A' + caminho[i]);
+        printf("%d ", caminho[i]);
     }
     printf("\n");
     printf("Tamanho do caminho: %d\n", pesoTotal);
-
-
-    free(vertices);
 
 }
 
@@ -170,13 +167,13 @@ int main(int argc, char* argv[])
 
     fclose(file);
 
-    printf("Matriz de Adjacencias:\n");
-    for (int i = 0; i < grafo.tamanho; i++) {
-        for (int j = 0; j < grafo.tamanho; j++) {
-            printf("%.1f ", grafo.dados[i * grafo.tamanho + j]);
-        }
-        printf("\n");
-    }
+    // printf("Matriz de Adjacencias:\n");
+    // for (int i = 0; i < grafo.tamanho; i++) {
+    //     for (int j = 0; j < grafo.tamanho; j++) {
+    //         printf("%.1f ", grafo.dados[i * grafo.tamanho + j]);
+    //     }
+    //     printf("\n");
+    // }
 
     // Criando o vetor de vértices
     Vertice *vertices = malloc(dimensao * sizeof(Vertice));
@@ -187,7 +184,7 @@ int main(int argc, char* argv[])
     
     //Criando o vértice raiz
     Vertice raiz;
-    raiz.id = 'A' + indiceRaiz; 
+    raiz.id = indiceRaiz; 
     raiz.distRaiz = 0; // Inicializa a distância da raiz como 0
     raiz.antecessor = '\0'; // Sem antecessor inicialmente
     raiz.jaVisitado = 0; // Marca como não visitado
