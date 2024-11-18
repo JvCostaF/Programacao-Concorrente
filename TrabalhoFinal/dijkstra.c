@@ -118,9 +118,7 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int v
 
 }
 
-
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     if (argc < 5) {
         fprintf(stderr, "Digite a dimensao do grafo, o arquivo de entrada, o indice do vertice raiz e o indice do vertice final.\n", argv[0]);
         return 1;
