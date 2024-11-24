@@ -3,8 +3,6 @@
 #include <limits.h>
 #include <pthread.h>
 
-#define NUM_THREADS 5
-
 typedef struct {
     int linhas;
     int colunas;
@@ -20,30 +18,22 @@ typedef struct {
 } Vertice;
 
 typedef struct {
-    int minIndex;
-    Vertice *vetices;
+    int thread_id;
+    int num_threads;
     MatrizDeAdjacencias *grafo;
+    Vertice *vertices;
+    int minIndex;
+    pthread_mutex_t *mutex;
+    pthread_barrier_t *barreira;
 } ThreadData;
 
-pthread_t threads[NUM_THREADS];
-pthread_mutex_t mutex;
-
-void imprimeVertices(MatrizDeAdjacencias *grafo, Vertice *vertices) {
-    int qtdVertices = grafo->linhas;
-    for(int j = 0; j < qtdVertices; j++){
-        printf("Vertice: %d\n", vertices[j].id);
-        printf("Distancia para a Raiz: %d\n", vertices[j].distRaiz);
-        printf("Antecessor: %d\n", vertices[j].antecessor);
-        printf("\n");
-    }
-}
-
+// Função para encontrar o menor índice da distância (realizada por uma thread principal)
 int menorDistancia(Vertice *vertices, int qtdVertices) {
     int minimo = INT_MAX;
-    int indVerticeMenorPeso;
-    
-    for(int v = 0; v < qtdVertices ; v++) {
-        if(!vertices[v].jaVisitado && vertices[v].distRaiz <= minimo) {
+    int indVerticeMenorPeso = -1;
+
+    for (int v = 0; v < qtdVertices; v++) {
+        if (!vertices[v].jaVisitado && vertices[v].distRaiz < minimo) {
             minimo = vertices[v].distRaiz;
             indVerticeMenorPeso = v;
         }
@@ -52,39 +42,48 @@ int menorDistancia(Vertice *vertices, int qtdVertices) {
     return indVerticeMenorPeso;
 }
 
-void* atualizarDistancias(void *args) {
-    ThreadData *data = (ThreadData*) args;
-    int minIndex = data->minIndex;
-    Vertice *vertices = data->vetices;
-    MatrizDeAdjacencias *grafo = data->grafo;
-    int qtdVertices = grafo->linhas;
+// Função executada por cada thread
+void *atualizarDistancias(void *arg) {
+    ThreadData *data = (ThreadData *)arg;
 
-    // Protegendo a atualização de distâncias com mutex
-    pthread_mutex_lock(&mutex);
+    int qtdVertices = data->grafo->linhas;
+    int start = (qtdVertices / data->num_threads) * data->thread_id;
+    int end = (data->thread_id == data->num_threads - 1) ? qtdVertices : start + (qtdVertices / data->num_threads);
 
-    // Atualiza as distâncias para os vizinhos do vértice atual
-    for (int i = 0; i < qtdVertices; i++) {
-        if (!vertices[i].jaVisitado && grafo->dados[minIndex * qtdVertices + i] != 0) {
-            int nova_distancia = vertices[minIndex].distRaiz + grafo->dados[minIndex * qtdVertices + i];
-            if (nova_distancia < vertices[i].distRaiz) {
-                vertices[i].distRaiz = nova_distancia;
-                vertices[i].antecessor = vertices[minIndex].id;
+    while (1) {
+        // Esperar pela thread principal selecionar o próximo vértice
+        pthread_barrier_wait(data->barreira);
+
+        if (data->minIndex == -1) break; // Nenhum vértice restante
+
+        // Atualizar os vizinhos
+        for (int i = start; i < end; i++) {
+            if (!data->vertices[i].jaVisitado && data->grafo->dados[data->minIndex * qtdVertices + i] != 0) {
+                int nova_distancia = data->vertices[data->minIndex].distRaiz +
+                                     data->grafo->dados[data->minIndex * qtdVertices + i];
+
+                pthread_mutex_lock(data->mutex);
+                if (nova_distancia < data->vertices[i].distRaiz) {
+                    data->vertices[i].distRaiz = nova_distancia;
+                    data->vertices[i].antecessor = data->minIndex;
+                }
+                pthread_mutex_unlock(data->mutex);
             }
         }
-    }
 
-    pthread_mutex_unlock(&mutex); // Liberando o mutex após a atualização
+        // Esperar todas as threads terminarem antes de avançar
+        pthread_barrier_wait(data->barreira);
+    }
 
     return NULL;
 }
 
-
-void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int verticeFinal) {
+void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int verticeFinal, int num_threads) {
     int qtdVertices = grafo->linhas;
-    
+
     // Inicialização dos vértices
-    for(int i = 0; i < qtdVertices; i++){
-        if(i == raiz.id){
+    for (int i = 0; i < qtdVertices; i++) {
+        if (i == raiz.id) {
             vertices[i] = raiz;
             continue;
         }
@@ -94,72 +93,93 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int v
         vertices[i].id = i;
     }
 
-    // Execução do algoritmo Dijkstra
-    for (int count = 0; count < qtdVertices - 1; count++) {
-        int minIndex = menorDistancia(vertices, qtdVertices); 
-        vertices[minIndex].jaVisitado = 1;
+    pthread_t threads[num_threads];
+    ThreadData thread_data[num_threads];
+    pthread_mutex_t mutex; //Mutex unico para garantir thread safe nas operacoes de atualizacao de valores de distancias.
+    pthread_barrier_t barreira;
 
-        ThreadData threadData;
-        threadData.minIndex = minIndex;
-        threadData.vetices = vertices;
-        threadData.grafo = grafo;
+    pthread_mutex_init(&mutex, NULL);
+    pthread_barrier_init(&barreira, NULL, num_threads + 1); //A quantidade de threads mais a thread main
 
-        // Criar ou reutilizar uma thread do pool para processar
-        pthread_create(&threads[count % NUM_THREADS], NULL, atualizarDistancias, &threadData);
-        
-        // Esperar todas as threads completarem antes de seguir para a próxima iteração
-        if ((count + 1) % NUM_THREADS == 0 || count == qtdVertices - 2) {
-            for (int i = 0; i < NUM_THREADS; i++) {
-                pthread_join(threads[i], NULL);
-            }
-        }
+    // Criar threads
+    for (int t = 0; t < num_threads; t++) {
+        thread_data[t].thread_id = t;
+        thread_data[t].num_threads = num_threads;
+        thread_data[t].grafo = grafo;
+        thread_data[t].vertices = vertices;
+        thread_data[t].minIndex = -1;
+        thread_data[t].mutex = &mutex;
+        thread_data[t].barreira = &barreira;
+        pthread_create(&threads[t], NULL, atualizarDistancias, &thread_data[t]);
     }
 
-    // Reconstruir o caminho mínimo (como antes)
+    // Executar o algoritmo de Dijkstra
+    for (int count = 0; count < qtdVertices - 1; count++) {
+        int minIndex = menorDistancia(vertices, qtdVertices);
+        if (minIndex == -1) break; // Grafo desconexo
+
+        vertices[minIndex].jaVisitado = 1;
+
+        // Atualizar o índice mínimo para as threads
+        for (int t = 0; t < num_threads; t++) {
+            thread_data[t].minIndex = minIndex;
+        }
+
+        // Permitir que as threads processem
+        pthread_barrier_wait(&barreira);
+
+        // Esperar as threads finalizarem
+        pthread_barrier_wait(&barreira);
+    }
+
+    // Finalizar as threads
+    for (int t = 0; t < num_threads; t++) {
+        thread_data[t].minIndex = -1; // Sinalizar término
+    }
+    pthread_barrier_wait(&barreira); // Permitir que as threads saiam
+
+    for (int t = 0; t < num_threads; t++) {
+        pthread_join(threads[t], NULL);
+    }
+
+    pthread_mutex_destroy(&mutex);
+    pthread_barrier_destroy(&barreira);
+
+    // Reconstrução do caminho mínimo
+    if (vertices[verticeFinal].distRaiz == INT_MAX) {
+        printf("Nao ha caminho minimo entre os vertices fornecidos!\n");
+        return;
+    }
+
     int caminho[qtdVertices];
     int indiceCaminho = 0;
     int v = verticeFinal;
-    int pesoTotal = 0;
 
     while (v != raiz.id) {
-        caminho[indiceCaminho] = v;
-        indiceCaminho++;
+        caminho[indiceCaminho++] = v;
         v = vertices[v].antecessor;
     }
     caminho[indiceCaminho++] = raiz.id;
 
-    for (int j = 0; j < qtdVertices; j++) {
-        if (vertices[j].id == vertices[verticeFinal].id) {
-            pesoTotal = vertices[verticeFinal].distRaiz;
-        }
-    }
-
-    printf("-----Resultados da execução do algoritmo-----\n");
-    printf("Caminho Mínimo: ");
+    printf("-----Resultados da execucao do algoritmo-----\n");
+    printf("Caminho Minimo: ");
     for (int i = indiceCaminho - 1; i >= 0; i--) {
         printf("%d ", caminho[i]);
     }
     printf("\n");
-    printf("Tamanho do caminho: %d\n", pesoTotal);
+    printf("Tamanho do caminho: %d\n", vertices[verticeFinal].distRaiz);
 }
 
-int main(int argc, char* argv[]) {
-    if (argc < 5) {
-        fprintf(stderr, "Digite a dimensao do grafo, o arquivo de entrada, o indice do vertice raiz e o indice do vertice final.\n", argv[0]);
+int main(int argc, char *argv[]) {
+    if (argc < 6) {
+        fprintf(stderr, "Digite a dimensao do grafo, o arquivo de entrada, o indice do vertice raiz, o indice do vertice final e o numero de threads.\n");
         return 1;
     }
 
     int dimensao = atoi(argv[1]);
     int indiceRaiz = atoi(argv[3]);
     int indiceFinal = atoi(argv[4]);
-
-    if (indiceRaiz < 0 || indiceRaiz >= dimensao) {
-        fprintf(stderr, "Indice do vertice raiz invalido!\n");
-    }
-
-    if (indiceFinal < 0 || indiceFinal >= dimensao) {
-        fprintf(stderr, "Indice do vertice final invalido!\n");
-    }
+    int num_threads = atoi(argv[5]);
 
     FILE *file = fopen(argv[2], "r");
     if (file == NULL) {
@@ -173,12 +193,6 @@ int main(int argc, char* argv[]) {
     grafo.tamanho = dimensao;
     grafo.dados = (float *)malloc(dimensao * dimensao * sizeof(float));
 
-    if (grafo.dados == NULL) {
-        fprintf(stderr, "Erro ao alocar memória para a matriz.\n");
-        fclose(file);
-        return 1;
-    }
-
     for (int i = 0; i < grafo.tamanho; i++) {
         for (int j = 0; j < grafo.tamanho; j++) {
             fscanf(file, "%f", &grafo.dados[i * grafo.tamanho + j]);
@@ -188,24 +202,12 @@ int main(int argc, char* argv[]) {
     fclose(file);
 
     Vertice *vertices = malloc(dimensao * sizeof(Vertice));
-    if (vertices == NULL) {
-        fprintf(stderr, "Erro ao alocar memória para os vértices.\n");
-        return 1;
-    }
+    Vertice raiz = { .id = indiceRaiz, .distRaiz = 0, .antecessor = -1, .jaVisitado = 0 };
 
-    Vertice raiz;
-    raiz.id = indiceRaiz;
-    raiz.distRaiz = 0;
-    raiz.antecessor = '\0';
-    raiz.jaVisitado = 0;
-
-    pthread_mutex_init(&mutex, NULL);
-
-    dijkstra(&grafo, vertices, raiz, indiceFinal);
+    dijkstra(&grafo, vertices, raiz, indiceFinal, num_threads);
 
     free(grafo.dados);
     free(vertices);
-    pthread_mutex_destroy(&mutex);
 
     return 0;
 }
