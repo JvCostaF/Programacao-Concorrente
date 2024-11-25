@@ -4,9 +4,7 @@
 #include <pthread.h>
 
 typedef struct {
-    int linhas;
-    int colunas;
-    int tamanho;
+    int dimensao;
     float *dados;
 } MatrizDeAdjacencias;
 
@@ -46,7 +44,7 @@ int menorDistancia(Vertice *vertices, int qtdVertices) {
 void *atualizarDistancias(void *arg) {
     ThreadData *data = (ThreadData *)arg;
 
-    int qtdVertices = data->grafo->linhas;
+    int qtdVertices = data->grafo->dimensao;
     int start = (qtdVertices / data->num_threads) * data->thread_id;
     int end = (data->thread_id == data->num_threads - 1) ? qtdVertices : start + (qtdVertices / data->num_threads);
 
@@ -79,7 +77,7 @@ void *atualizarDistancias(void *arg) {
 }
 
 void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int verticeFinal, int num_threads) {
-    int qtdVertices = grafo->linhas;
+    int qtdVertices = grafo->dimensao;
 
     // Inicialização dos vértices
     for (int i = 0; i < qtdVertices; i++) {
@@ -181,23 +179,18 @@ int main(int argc, char *argv[]) {
     int indiceFinal = atoi(argv[4]);
     int num_threads = atoi(argv[5]);
 
-    FILE *file = fopen(argv[2], "r");
+    FILE *file = fopen(argv[2], "rb");
     if (file == NULL) {
         fprintf(stderr, "Erro ao abrir o arquivo.\n");
         return 2;
     }
 
     MatrizDeAdjacencias grafo;
-    grafo.linhas = dimensao;
-    grafo.colunas = dimensao;
-    grafo.tamanho = dimensao;
+    grafo.dimensao = dimensao;
     grafo.dados = (float *)malloc(dimensao * dimensao * sizeof(float));
 
-    for (int i = 0; i < grafo.tamanho; i++) {
-        for (int j = 0; j < grafo.tamanho; j++) {
-            fscanf(file, "%f", &grafo.dados[i * grafo.tamanho + j]);
-        }
-    }
+    // Lendo os dados da matriz do arquivo binário
+    fread(grafo.dados, sizeof(float), dimensao * dimensao, file);
 
     fclose(file);
 

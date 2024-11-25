@@ -3,9 +3,7 @@
 #include <limits.h>
 
 typedef struct {
-    int linhas;
-    int colunas;
-    int tamanho;
+    int dimensao;
     float *dados;
 } MatrizDeAdjacencias;
 
@@ -17,7 +15,7 @@ typedef struct {
 } Vertice;
 
 void imprimeVertices(MatrizDeAdjacencias *grafo, Vertice *vertices) {
-    int qtdVertices = grafo->linhas;
+    int qtdVertices = grafo->dimensao;
     for(int j = 0; j < qtdVertices; j++){
         printf("Vertice: %d\n", vertices[j].id);
         printf("Distancia para a Raiz: %d\n", vertices[j].distRaiz);
@@ -31,7 +29,7 @@ int menorDistancia(Vertice *vertices, int qtdVertices) {
     int indVerticeMenorPeso;
     
     for(int v = 0; v < qtdVertices ; v++) {
-        if(!vertices[v].jaVisitado && vertices[v].distRaiz <= minimo) {
+        if(!vertices[v].jaVisitado && vertices[v].distRaiz <= minimo) { // O(n)
             minimo = vertices[v].distRaiz;
             indVerticeMenorPeso = v;
         }
@@ -41,9 +39,10 @@ int menorDistancia(Vertice *vertices, int qtdVertices) {
 }
 
 
-void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int verticeFinal) {
+void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int verticeFinal) 
+{
 
-    int qtdVertices = grafo->linhas;
+    int qtdVertices = grafo->dimensao;
     
     //Inicialmente, todos os vertices precisam ter distRaiz = INFINITO, antecessor = NULL, jaVisitado = 0 e o seu proprio id
     for(int i = 0; i < qtdVertices; i++){
@@ -90,20 +89,12 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int v
     int caminho[qtdVertices];
     int indiceCaminho = 0;
     int v = verticeFinal;
-    int pesoTotal = 0;
+
     while (v != raiz.id) {
-        caminho[indiceCaminho] = v;
-        indiceCaminho++;
+        caminho[indiceCaminho++] = v;
         v = vertices[v].antecessor;
     }
     caminho[indiceCaminho++] = raiz.id;
-
-
-    for (int j = 0; j < qtdVertices; j++) {
-        if (vertices[j].id==vertices[verticeFinal].id) {
-            pesoTotal=vertices[verticeFinal].distRaiz;
-        }
-    }
 
     //imprimeVertices(grafo, vertices);
 
@@ -114,11 +105,12 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int v
         printf("%d ", caminho[i]);
     }
     printf("\n");
-    printf("Tamanho do caminho: %d\n", pesoTotal);
+    printf("Tamanho do caminho: %d\n", vertices[verticeFinal].distRaiz);
 
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) 
+{
     if (argc < 5) {
         fprintf(stderr, "Digite a dimensao do grafo, o arquivo de entrada, o indice do vertice raiz e o indice do vertice final.\n", argv[0]);
         return 1;
@@ -137,7 +129,7 @@ int main(int argc, char* argv[]) {
     }
     
 
-    FILE *file = fopen(argv[2], "r");
+    FILE *file = fopen(argv[2], "rb");
     if (file == NULL) {
         fprintf(stderr, "Erro ao abrir o arquivo.\n");
         return 2;
@@ -145,9 +137,7 @@ int main(int argc, char* argv[]) {
 
     //Criando o grafo 
     MatrizDeAdjacencias grafo;
-    grafo.linhas = dimensao;
-    grafo.colunas = dimensao;
-    grafo.tamanho = dimensao;
+    grafo.dimensao = dimensao;
     grafo.dados = (float *)malloc(dimensao * dimensao * sizeof(float));
 
     if (grafo.dados == NULL) {
@@ -157,21 +147,17 @@ int main(int argc, char* argv[]) {
     }
 
     //Lendo os dados da matriz do arquivo
-    for (int i = 0; i < grafo.tamanho; i++) {
-        for (int j = 0; j < grafo.tamanho; j++) {
-            fscanf(file, "%f", &grafo.dados[i * grafo.tamanho + j]);
-        }
-    }
+    fread(grafo.dados, sizeof(float), dimensao * dimensao, file);
 
     fclose(file);
 
-    // printf("Matriz de Adjacencias:\n");
-    // for (int i = 0; i < grafo.tamanho; i++) {
-    //     for (int j = 0; j < grafo.tamanho; j++) {
-    //         printf("%.1f ", grafo.dados[i * grafo.tamanho + j]);
-    //     }
-    //     printf("\n");
-    // }
+    printf("Matriz de Adjacencias:\n");
+    for (int i = 0; i < grafo.dimensao; i++) {
+        for (int j = 0; j < grafo.dimensao; j++) {
+            printf("%.1f ", grafo.dados[i * grafo.dimensao + j]);
+        }
+        printf("\n");
+    }
 
     // Criando o vetor de vértices
     Vertice *vertices = malloc(dimensao * sizeof(Vertice));
