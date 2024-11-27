@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include "timer.h"
 
 typedef struct {
     int dimensao;
@@ -109,10 +110,18 @@ void dijkstra(MatrizDeAdjacencias *grafo, Vertice *vertices, Vertice raiz, int v
 
 }
 
-int main(int argc, char* argv[]) 
-{
+int main(int argc, char* argv[]) {
+
+    double time_inicio, time_fim, time_delta;
+
+    // Nome do arquivo CSV para armazenar os resultados
+    const char *csvFilename = "resultados.csv";
+    FILE *csvFile;
+
+    GET_TIME(time_inicio);
+
     if (argc < 5) {
-        fprintf(stderr, "Digite a dimensao do grafo, o arquivo de entrada, o indice do vertice raiz e o indice do vertice final.\n", argv[0]);
+        fprintf(stderr, "Digite a dimensao do grafo, o arquivo de entrada, o indice do vertice raiz e o indice do vertice final.\n");
         return 1;
     }
 
@@ -151,13 +160,13 @@ int main(int argc, char* argv[])
 
     fclose(file);
 
-    printf("Matriz de Adjacencias:\n");
-    for (int i = 0; i < grafo.dimensao; i++) {
-        for (int j = 0; j < grafo.dimensao; j++) {
-            printf("%.1f ", grafo.dados[i * grafo.dimensao + j]);
-        }
-        printf("\n");
-    }
+    // printf("Matriz de Adjacencias:\n");
+    // for (int i = 0; i < grafo.dimensao; i++) {
+    //     for (int j = 0; j < grafo.dimensao; j++) {
+    //         printf("%.1f ", grafo.dados[i * grafo.dimensao + j]);
+    //     }
+    //     printf("\n");
+    // }
 
     // Criando o vetor de vértices
     Vertice *vertices = malloc(dimensao * sizeof(Vertice));
@@ -177,6 +186,27 @@ int main(int argc, char* argv[])
 
     free(grafo.dados);
     free(vertices);
+
+    GET_TIME(time_fim);
+    time_delta = time_fim - time_inicio;
+    printf("Tempo total sequencial:%lf\n", time_delta);
+
+    // Abre o arquivo CSV para adicionar resultados
+    csvFile = fopen(csvFilename, "a");
+    if (csvFile == NULL) {
+        fprintf(stderr, "Erro ao abrir o arquivo CSV.\n");
+        return 3;
+    }
+
+    // Se o arquivo CSV estiver vazio, escreve o cabeçalho
+    if (ftell(csvFile) == 0) {
+        fprintf(csvFile, "Forma, Dimensao, NumThreads, TempoTotal\n");
+    }
+
+    // Grava os resultados no arquivo CSV
+    fprintf(csvFile, "%s, %d, %d, %lf\n", "Sequencial", dimensao, 0, time_delta);
+
+    fclose(csvFile);
 
     return 0;
 }
