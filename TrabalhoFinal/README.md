@@ -49,7 +49,7 @@ pip install networkx
 ```
 
 ### O Algoritmo Sequencial
-O arquivo **dijkstra.c** e o nosso algoritmo sequencial. Para executar voce deve fazer a compilacao do codigo (Recomendo fortemente utilizar o gcc), para funcionar o codigo espera que sejam passados: A dimensao da matriz de adjacencia, o arquivo que contenha a matriz (Um arquivo binario ou texto), o vertice raiz e o vertice destino. 
+O arquivo **dijkstra.c** é o nosso algoritmo sequencial. Para executar voce deve fazer a compilacao do codigo (Recomendo fortemente utilizar o gcc), para funcionar o codigo espera que sejam passados: A dimensao da matriz de adjacencia, o arquivo que contenha a matriz (Um arquivo binario ou texto), o vertice raiz e o vertice destino. 
 
 Nosso codigo foi feito para encontrar o caminho minimo da raiz para qualquer vertice, mas pedimos que seja passado um vertice de destino para facilitar a impressao dos resultados do algoritmo pelo terminal.
 
@@ -62,4 +62,20 @@ Para executar:
 ```
 .\<nome do executavel> <dimensao> <arquivo de entrada> <raiz> <destino>
 .\a 10 matriz10x10.bin 0 6 (exemplo)
+```
+
+### O Algoritmo Concorrente
+O arquivo **dijkstraConc.c** é o nosso algoritmo concorrente. Para executar voce deve fazer a compilacao do codigo (Recomendo fortemente utilizar o gcc), para funcionar o codigo espera que sejam passados: A dimensao da matriz de adjacencia, o arquivo que contenha a matriz (Um arquivo binario ou texto), o vertice raiz, o vertice destino e a quantidade de threads. 
+
+Nosso codigo foi feito para encontrar o caminho minimo da raiz para qualquer vertice, mas pedimos que seja passado um vertice de destino para facilitar a impressao dos resultados do algoritmo pelo terminal.
+
+Para compilar:
+```
+gcc dijkstraConc.c
+```
+
+Para executar:
+```
+.\<nome do executavel> <dimensao> <arquivo de entrada> <raiz> <destino> <qtd de threads>
+.\a 10 matriz10x10.bin 0 6 2(exemplo)
 ```
