@@ -24,7 +24,7 @@ A complexidade do algoritmo de Dijkstra é O(|V| + |E|) * log |V|, onde V é a q
 ### O Gerador de Grafos
 Um dos nossos problemas era encontrar um grafo, relativamente grande, para realizar os testes e coletar as métricas que vão nos permitir validar se houve ganho de performance ou não.
 
-Pensando nisso, implementamos um programa em **Python** que gera grafos randomizados utilizando as libs Numpy e NetworkX. Estamos utilizando **gnp_random_graph(n, p)**, onde passamos o número fixo de vértices **n** e um valor de probabilidade **p**, esse valor representa a probabilidade de existir uma aresta entre dois vértices do grafo gerado. Além disso, atribuímos pesos nas arestas de maneira que esses pesos não sejam negativos, pois isso faria o algoritmo falhar. E salvamos a matriz de adjacências em um arquivo (esse arquivo será utilizado como parâmetro de entrada nos programas: sequencia e concorrente). 
+Pensando nisso, implementamos um programa em **Python** que gera grafos randomizados utilizando as libs Numpy e NetworkX. Estamos utilizando **fast_gnp_random_graph(n, p)**, onde passamos o número fixo de vértices **n** e um valor de probabilidade **p**, esse valor representa a probabilidade de existir uma aresta entre dois vértices do grafo gerado. Além disso, atribuímos pesos nas arestas de maneira que esses pesos não sejam negativos, pois isso faria o algoritmo falhar. E salvamos a matriz de adjacências em um arquivo (esse arquivo será utilizado como parâmetro de entrada nos programas: sequencia e concorrente). 
 
 Para rodar o programa localmente é necessário:
 - Ter o Python instalado e configurado na máquina;
